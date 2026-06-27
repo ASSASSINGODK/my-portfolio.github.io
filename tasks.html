@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Development Tasks - Level 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tasks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .task-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .task-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .task-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .task-title {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .task-subtitle {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .task-content {
+            padding: 30px 25px;
+        }
+
+        .task-description {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 1em;
+        }
+
+        .task-features {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .task-features h3 {
+            color: #667eea;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+        }
+
+        .task-features ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .task-features li {
+            padding: 5px 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .task-features li:before {
+            content: "✓ ";
+            color: #10b981;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .task-link {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-align: center;
+            width: 100%;
+        }
+
+        .task-link:hover {
+            background: #764ba2;
+            transform: scale(1.02);
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 60px;
+        }
+
+        footer p {
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-link:hover {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            header p {
+                font-size: 1em;
+            }
+
+            .task-title {
+                font-size: 1.5em;
+            }
+
+            .tasks-grid {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Web Development Internship Tasks</h1>
+            <p>Level 1 - Complete Portfolio Projects</p>
+        </header>
+
+        <div class="tasks-grid">
+            <!-- Task 1: Portfolio -->
+            <div class="task-card">
+                <div class="task-header">
+                    <div class="task-number">01</div>
+                    <div class="task-title">Portfolio</div>
+                    <div class="task-subtitle">Personal Showcase</div>
+                </div>
+                <div class="task-content">
+                    <p class="task-description">Create a professional personal portfolio using CSS and HTML. Showcase your skills, projects, experience, and contact information.</p>
+                    <div class="task-features">
+                        <h3>Includes:</h3>
+                        <ul>
+                            <li>Header with name and tagline</li>
+                            <li>About section with bio</li>
+                            <li>Skills showcase</li>
+                            <li>Featured projects</li>
+                            <li>Education history</li>
+                            <li>Resume download</li>
+                            <li>Contact information</li>
+                        </ul>
+                    </div>
+                    <a href="index.html" class="task-link">View Portfolio</a>
+                </div>
+            </div>
+
+            <!-- Task 2: Landing Page -->
+            <div class="task-card">
+                <div class="task-header">
+                    <div class="task-number">02</div>
+                    <div class="task-title">Landing Page</div>
+                    <div class="task-subtitle">Product Entry Point</div>
+                </div>
+                <div class="task-content">
+                    <p class="task-description">Design an attractive landing page with a strong headline, description, image, and clear call-to-action button for your demo.</p>
+                    <div class="task-features">
+                        <h3>Includes:</h3>
+                        <ul>
+                            <li>Gradient background design</li>
+                            <li>Bold headline and tagline</li>
+                            <li>Feature image showcase</li>
+                            <li>Key feature highlights</li>
+                            <li>Prominent demo button</li>
+                            <li>Modern glassmorphism effects</li>
+                            <li>Responsive layout</li>
+                        </ul>
+                    </div>
+                    <a href="landing.html" class="task-link">View Landing Page</a>
+                </div>
+            </div>
+
+            <!-- Task 3: Calculator -->
+            <div class="task-card">
+                <div class="task-header">
+                    <div class="task-number">03</div>
+                    <div class="task-title">Calculator</div>
+                    <div class="task-subtitle">Interactive Tool</div>
+                </div>
+                <div class="task-content">
+                    <p class="task-description">Build a functional calculator with HTML, CSS, and JavaScript. Support basic arithmetic operations with an interactive interface.</p>
+                    <div class="task-features">
+                        <h3>Includes:</h3>
+                        <ul>
+                            <li>Addition & Subtraction</li>
+                            <li>Multiplication & Division</li>
+                            <li>Decimal point support</li>
+                            <li>Clear button functionality</li>
+                            <li>Real-time display</li>
+                            <li>Error handling</li>
+                            <li>Responsive grid buttons</li>
+                        </ul>
+                    </div>
+                    <a href="calculator.html" class="task-link">View Calculator</a>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 Koushik Vardhan - Web Development Internship Tasks</p>
+            <div class="footer-links">
+                <a href="index.html" class="footer-link">Portfolio</a>
+                <a href="landing.html" class="footer-link">Landing Page</a>
+                <a href="calculator.html" class="footer-link">Calculator</a>
+                <a href="https://github.com/ASSASSINGODK" class="footer-link" target="_blank">GitHub</a>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

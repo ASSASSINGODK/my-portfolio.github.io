@@ -1,0 +1,357 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>♾️Anime</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="Assassingodk1.css">
+</head>
+<body>
+    <header>
+        <a href="Assassingodk.html" class="logo"><i class="fas fa-infinity"></i>Anime.</a>
+      <nav class="navbar" id="navbar">
+    <a href="Assassingodk.html" id="home-link">home</a>
+    <a href="page2.html" id="anime-link">anime</a>
+    <a href="#action">action</a>
+    <a href="#manga">manga</a>
+    <a href="#movies">movies</a>
+</nav>
+        <div class="icons">
+            <span class="menu-icon" id="menu-bars" role="button" aria-label="Open menu" style="cursor: pointer; position:relative; z-index:110;"><i class="fas fa-bars"></i></span>
+            <span class="search-icon" id="search-icons" style="cursor: pointer;"><i class="fas fa-search"></i></span>
+            <span id="favorites-btn" role="button" aria-label="Favorites" style="cursor: pointer; position:relative; z-index:110;"><i id="favorites-icon" class="far fa-heart"></i></span>
+            <span id="user-icon" role="button" aria-label="User account" style="cursor: pointer; position:relative; z-index:110;"><i class="fas fa-user-circle"></i></span>
+        </div>
+        <div id="user-menu" class="user-menu" aria-hidden="true">
+            <div id="user-menu-content"></div>
+        </div>
+        <div class="search-bar" id="search-bar">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <input type="text" id="search-input" placeholder="Search anime..." style="background:transparent;border:none;color:#fff;outline:none;width:180px;font-size:1rem;">
+                <button onclick="searchAnime()" style="background:var(--accent);border:none;color:#000;padding:6px 12px;border-radius:4px;cursor:pointer;font-weight:600;">Go</button>
+            </div>
+            <div id="search-suggestions"></div>
+        </div>
+        <div id="favorites-panel" class="favorites-panel" aria-hidden="true"></div>
+    </header>
+    <main>
+        <section class="home" id="home">
+            <div class="home-slider">
+                <div class="wrapper">
+                    <div class="slide">
+                        <div class="content">
+                            <h3>Welcome to Assassingodk</h3>
+                            <p>Discover a world of anime, manga, movies, and comics. Dive into curated collections, trending series, and exclusive recommendations. Your gateway to the best in entertainment starts here!</p>
+                            <ul>
+                                <li>🔥 Trending Anime</li>
+                                <li>📚 Latest Manga</li>
+                                <li>🎬 Movie Premieres</li>
+                                <li>🌟 Community Picks</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="owner-text">
+		          <p>Owned and operated by koushik vardhan</p><br>
+		          Contact :<br><a href="tel:9390956911">9390956911</a>
+        			<br>
+        			<a href="koushikvardhan2006@gmail.com">koushikvardhan2006@gmail.com</a>
+        			<br>
+        			<a href="andhra pradesh, india - 533005">andhra pradesh, india - 533005</a>
+        		</div>
+            </div>
+        </section>
+    </main>
+</body>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Assassingodk: DOMContentLoaded script running');
+    const menuBars = document.getElementById('menu-bars');
+    const navbar = document.getElementById('navbar');
+    const headerEl = document.querySelector('header');
+    if (menuBars && navbar && headerEl) {
+        menuBars.addEventListener('click', function(e) {
+            e.stopPropagation();
+            console.log('Assassingodk: menu-bars clicked', e.target);
+            headerEl.classList.toggle('menu-open');
+        });
+        document.addEventListener('click', function(e) {
+            if (!headerEl.contains(e.target) && e.target !== menuBars && !menuBars.contains(e.target)) {
+                headerEl.classList.remove('menu-open');
+            }
+        });
+        navbar.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
+                headerEl.classList.remove('menu-open');
+            });
+        });
+    }
+
+    // Search functionality
+    const searchIcon = document.getElementById('search-icons');
+    const searchBar = document.getElementById('search-bar');
+    const searchInputEl = document.getElementById('search-input');
+    const suggestionsDiv = document.getElementById('search-suggestions');
+
+    if (searchIcon && searchBar) {
+        searchIcon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            searchBar.classList.toggle('active');
+            if (searchBar.classList.contains('active') && searchInputEl) {
+                searchInputEl.focus();
+            }
+        });
+    }
+
+    function searchAnime() {
+        if (!searchInputEl) return;
+        const query = searchInputEl.value.toLowerCase().trim();
+        if (!query) return;
+        const animeMap = {
+            'naruto': 'naruto.html',
+            'bleach': 'bleach.html',
+            'danmachi': 'danmachi.html',
+            'aot': 'aot.html',
+            'onepiece': 'onepiece.html',
+            'boruto': 'boruto.html'
+        };
+        if (animeMap[query]) {
+            window.location.href = animeMap[query];
+        } else {
+            alert('Anime not found. Try: naruto, bleach, danmachi, aot, or onepiece');
+        }
+    }
+
+    if (searchInputEl) {
+        searchInputEl.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchAnime();
+        });
+        searchInputEl.addEventListener('input', function() {
+            if (!suggestionsDiv) return;
+            const value = this.value.toLowerCase().trim();
+            suggestionsDiv.innerHTML = '';
+            if (value.length === 0) {
+                suggestionsDiv.classList.remove('show');
+                return;
+            }
+            const animeData = {
+                'naruto': { title: 'Naruto', img: 'naruto.jpg', url: 'naruto.html', alias: ['naruto'] },
+                'bleach': { title: 'Bleach', img: 'bleach.jpg', url: 'bleach.html', alias: ['bleach'] },
+                'danmachi': { title: 'Danmachi', img: 'danmachi.jpg', url: 'danmachi.html', alias: ['danmachi'] },
+                'aot': { title: 'Attack on Titan', img: 'aot.jpg', url: 'aot.html', alias: ['aot', 'attack on titan'] },
+                'onepiece': { title: 'One Piece', img: 'download.jpg', url: 'onepiece.html', alias: ['onepiece', 'one piece'] },
+                'boruto': { title: 'Boruto', img: 'boruto.jpg', url: 'boruto.html', alias: ['boruto'] }
+            };
+            const filtered = Object.entries(animeData).filter(([key, anime]) => 
+                anime.title.toLowerCase().includes(value) || 
+                anime.alias.some(alias => alias.startsWith(value))
+            );
+            if (filtered.length === 0) {
+                suggestionsDiv.classList.remove('show');
+                return;
+            }
+            suggestionsDiv.classList.add('show');
+            filtered.forEach(([key, anime]) => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `<img src="${anime.img}" alt="${anime.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22%3E%3Crect fill=%22%23333%22 width=%22120%22 height=%22120%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'"><div class="suggestion-title">${anime.title}</div>`;
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    window.location.href = anime.url;
+                });
+                suggestionsDiv.appendChild(item);
+            });
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        const searchBarEl = document.getElementById('search-bar');
+        const searchIconEl = document.getElementById('search-icons');
+        const suggestions = document.getElementById('search-suggestions');
+        if (searchBarEl && !searchBarEl.contains(e.target) && e.target !== searchIconEl) {
+            searchBarEl.classList.remove('active');
+            if (suggestions) suggestions.classList.remove('show');
+        }
+    });
+
+    // Favorites: localStorage-backed panel
+    const favoritesBtn = document.getElementById('favorites-btn');
+    const favoritesPanel = document.getElementById('favorites-panel');
+    const favoritesIcon = document.getElementById('favorites-icon');
+
+    function loadFavorites() {
+        try {
+            return JSON.parse(localStorage.getItem('favorites') || '[]');
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveFavorites(list) {
+        localStorage.setItem('favorites', JSON.stringify(list || []));
+        renderFavorites();
+        updateFavoritesIcon();
+    }
+
+    function updateFavoritesIcon() {
+        const favs = loadFavorites();
+        const current = window.location.pathname.split('/').pop();
+        if (favs.find(f => f.url === current)) {
+            favoritesIcon.className = 'fas fa-heart';
+        } else if (favs.length) {
+            // if there are favorites, show filled small indicator
+            favoritesIcon.className = 'fas fa-heart';
+        } else {
+            favoritesIcon.className = 'far fa-heart';
+        }
+    }
+
+    function renderFavorites() {
+        if (!favoritesPanel) return;
+        const list = loadFavorites();
+        favoritesPanel.innerHTML = '';
+        const header = document.createElement('div');
+        header.className = 'favorites-header';
+        header.textContent = 'Favorites';
+        favoritesPanel.appendChild(header);
+
+        if (!list.length) {
+            const empty = document.createElement('div');
+            empty.className = 'favorites-empty';
+            empty.textContent = 'No favorites yet.';
+            favoritesPanel.appendChild(empty);
+        } else {
+            const ul = document.createElement('div');
+            ul.className = 'favorites-list';
+            list.forEach((f, idx) => {
+                const item = document.createElement('div');
+                item.className = 'favorite-item';
+                const a = document.createElement('a');
+                a.href = f.url;
+                a.textContent = f.title || f.url;
+                a.addEventListener('click', function() {
+                    // close panel on navigate
+                    favoritesPanel.classList.remove('show');
+                });
+                const remove = document.createElement('button');
+                remove.className = 'favorite-remove';
+                remove.textContent = 'Remove';
+                remove.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const newList = loadFavorites().filter((_, i) => i !== idx);
+                    saveFavorites(newList);
+                });
+                item.appendChild(a);
+                item.appendChild(remove);
+                ul.appendChild(item);
+            });
+            favoritesPanel.appendChild(ul);
+        }
+
+        // Add button to favorite current page
+        const addBtn = document.createElement('button');
+        addBtn.className = 'favorite-add';
+        addBtn.textContent = 'Add current page';
+        addBtn.addEventListener('click', function() {
+            const title = document.title || window.location.pathname.split('/').pop();
+            const url = window.location.pathname.split('/').pop() || window.location.href;
+            const list = loadFavorites();
+            if (!list.find(f => f.url === url)) {
+                list.unshift({ title, url });
+                saveFavorites(list);
+            }
+        });
+        favoritesPanel.appendChild(addBtn);
+    }
+
+    if (favoritesBtn) {
+        favoritesBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Open the favorites page which will show saved favorites
+            window.location.href = 'favorites.html';
+        });
+        // keep panel close behavior if panel exists
+        if (favoritesPanel) {
+            document.addEventListener('click', function(e) {
+                if (!favoritesPanel.contains(e.target) && e.target !== favoritesBtn && !favoritesBtn.contains(e.target)) {
+                    favoritesPanel.classList.remove('show');
+                    favoritesPanel.setAttribute('aria-hidden', 'true');
+                }
+            });
+        }
+    }
+
+    updateFavoritesIcon();
+
+    // User login/logout functionality
+    const userIcon = document.getElementById('user-icon');
+    const userMenu = document.getElementById('user-menu');
+    const userMenuContent = document.getElementById('user-menu-content');
+
+    function updateUserMenu() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser && currentUser.loggedIn) {
+            userMenuContent.innerHTML = `
+                <div class="user-menu-item" style="padding:10px;border-bottom:1px solid #4cc9f0;color:#4cc9f0;font-weight:600;">
+                    Welcome, ${currentUser.username}!
+                </div>
+                <button id="logoutBtn" style="width:100%;padding:10px;background:#ff7b9a;border:none;color:#fff;cursor:pointer;font-weight:600;border-radius:4px;">Logout</button>
+            `;
+            // Attach logout event after button is created
+            setTimeout(() => {
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', logout);
+                }
+            }, 0);
+        } else {
+            userMenuContent.innerHTML = `
+                <a href="login.html" style="display:block;padding:10px;color:#4cc9f0;text-decoration:none;text-align:center;border-bottom:1px solid #4cc9f0;font-weight:600;">Login</a>
+                <a href="sign up.html" style="display:block;padding:10px;color:#4cc9f0;text-decoration:none;text-align:center;font-weight:600;">Sign Up</a>
+            `;
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('rememberMe');
+        updateUserMenu();
+        userMenu.classList.remove('show');
+        window.location.href = 'Assassingodk.html';
+    }
+
+    if (userIcon && userMenu) {
+        userIcon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userMenu.classList.toggle('show');
+            if (userMenu.classList.contains('show')) {
+                userMenu.setAttribute('aria-hidden', 'false');
+            } else {
+                userMenu.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!userMenu.contains(e.target) && e.target !== userIcon && !userIcon.contains(e.target)) {
+                userMenu.classList.remove('show');
+                userMenu.setAttribute('aria-hidden', 'true');
+            }
+        });
+    }
+
+    updateUserMenu();
+
+    // Optional: set active nav
+    (function setActiveNav() {
+        const pathname = window.location.pathname;
+        if (pathname.endsWith('Assassingodk.html')) {
+            document.getElementById('home-link')?.classList.add('active');
+        } else if (pathname.endsWith('page2.html')) {
+            document.getElementById('anime-link')?.classList.add('active');
+        }
+    })();
+});
+</script>
+</html>

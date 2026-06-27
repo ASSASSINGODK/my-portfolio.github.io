@@ -1,0 +1,612 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attack on Titan</title>
+    <link rel="stylesheet" href="Assassingodk1.css">
+    <style>
+        html, body {background:#181a20;color:#fff;font-family:'Segoe UI',Arial,sans-serif;margin:0;padding:0;height:100%;width:100%;}
+        header {width:100%;padding:20px 40px;background:#1c1f26;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+        .logo {color:#4cc9f0;font-size:2rem;text-decoration:none;font-weight:bold;display:flex;align-items:center;}
+        .logo i {margin-right:8px;}
+        .navbar {display:none;flex-direction:column;gap:20px;background:#232531;position:absolute;top:70px;right:40px;border-radius:10px;padding:20px;min-width:150px;box-shadow:0 4px 12px rgba(0,0,0,0.22);z-index:2000;}
+        .navbar.show {display:flex;}
+        .navbar a {color:#fff;text-decoration:none;font-size:1.1rem;font-weight:500;padding:8px 12px;border-radius:4px;transition:background 0.2s;}
+        .navbar a.active, .navbar a:hover {background:#4cc9f0;color:#fff;}
+        .icons {display:flex;align-items:center;gap:18px;font-size:1.5rem;color:#fff;}
+        .search-bar {display:none;flex-direction:column;gap:8px;background:#232531;padding:8px 12px;border-radius:8px;border:1px solid #4cc9f0;position:absolute;top:70px;right:40px;z-index:1999;}
+        .search-bar.active {display:flex !important;}
+        .search-bar input {background:transparent;border:none;color:#fff;outline:none;width:180px;font-size:1rem;}
+        .search-bar input::placeholder {color:#999;}
+        .search-bar button {background:#4cc9f0;border:none;color:#fff;padding:6px 12px;border-radius:4px;cursor:pointer;font-weight:600;}
+        .search-bar button:hover {background:#38b0d8;}
+        .search-input-wrapper {display:flex;align-items:center;gap:8px;}
+        .search-suggestions {display:none;max-height:200px;overflow-y:auto;border-top:1px solid #4cc9f0;margin-top:8px;}
+        .search-suggestions.show {display:block;}
+        .suggestion-item {padding:8px 12px;color:#fff;cursor:pointer;border-bottom:1px solid #333;}
+        .suggestion-item:hover {background:#4cc9f0;color:#000;}
+        .search-icon {cursor:pointer;}
+        .menu-icon {font-size:2rem;cursor:pointer;color:#4cc9f0;}
+        main {width:100vw;min-height:100vh;box-sizing:border-box;padding-top:110px;}
+        .main-content {width:100%;max-width:1200px;margin:0 auto;padding:0 40px 40px 40px;display:flex;flex-direction:column;}
+        h1 {color:#4cc9f0;margin-bottom:28px;font-size:2.7rem;font-weight:900;letter-spacing:2px;text-shadow:2px 2px 0 #000, 0 2px 12px #4cc9f088;}
+        .video-center {display:flex;justify-content:center;width:100%;margin-bottom:32px;}
+        video {width:100%;max-width:650px;height:auto;object-fit:contain;border-radius:10px;background:#000;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+        #episode-title {margin:16px 0 18px 0;font-size:1.3rem;color:#4cc9f0;font-weight:bold;min-height:24px;text-align:center;text-shadow:1px 1px 0 #000, 0 2px 8px #4cc9f088;}
+        .desc-image-row {display:flex;flex-direction:row;gap:32px;width:100%;align-items:flex-start;margin-bottom:30px;}
+        .image-left {flex:0 0 220px;display:flex;justify-content:flex-start;align-items:flex-start;}
+        .image-left img {width:180px;height:260px;object-fit:cover;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.16);display:block;}
+        .description {flex:1;color:#ececec;font-size:1.13rem;max-width:700px;text-align:left;align-self:stretch;display:flex;align-items:center;}
+        .button-section {display:flex;flex-direction:column;gap:10px;margin-bottom:28px;margin-top:8px;}
+        .episode-range-buttons {display:flex;gap:10px;margin-bottom:18px;justify-content:center;}
+        .range-btn {background:#4cc9f0;color:#fff;border:none;padding:10px 22px;font-size:1rem;border-radius:8px;font-weight:600;cursor:pointer;transition:background 0.18s, color 0.18s, transform 0.15s;outline:none;box-shadow:0 2px 8px #0002;}
+        .range-btn.active, .range-btn:hover {background:#38b0d8;color:#fff;transform:translateY(-2px) scale(1.06);box-shadow:0 2px 8px #4cc9f088;}
+        .episode-group {display:none;flex-wrap:nowrap;gap:10px;margin-top:10px;overflow-x:auto;max-width:100%;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:#4cc9f0 #232531;}
+        .episode-group::-webkit-scrollbar {height:8px;}
+        .episode-group::-webkit-scrollbar-thumb {background:#4cc9f0;border-radius:5px;}
+        .episode-group::-webkit-scrollbar-track {background:#232531;border-radius:5px;}
+        .episode-group.active {display:flex;}
+        .button {background-color:#4cc9f0;border:none;color:white;padding:10px 20px;font-size:16px;border-radius:6px;transition:background 0.2s, transform 0.15s;cursor:pointer;font-weight:500;box-shadow:0 2px 6px rgba(0,0,0,0.12);}
+        .button:hover {background-color:#38b0d8;transform:translateY(-2px) scale(1.04);}
+        .button:active {background-color:#2d98a8;transform:scale(0.98);}
+        .recommend-section {margin-top:32px;}
+        .recommend-title {color:#4cc9f0;font-size:1.5rem;font-weight:bold;margin-bottom:18px;}
+        .recommend-list {display:flex;flex-wrap:wrap;gap:26px;width:100%;justify-content:flex-start;}
+        .anime-card {background:rgba(24,24,24,0.8);border-radius:12px;padding:18px 16px;width:185px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,0.16);transition:transform 0.18s;}
+        .anime-card:hover {transform:translateY(-4px) scale(1.03);}
+        .anime-card img {width:130px;height:180px;object-fit:cover;border-radius:10px;}
+        .anime-card h3 {color:#4cc9f0;font-size:1.05rem;margin:10px 0 6px 0;}
+        .anime-card p {color:#ddd;font-size:0.97rem;margin:0;}
+        footer {color: #ddd; background: #1c1f26; text-align: center; padding: 24px 8px 22px 8px; font-size: 1.02em;}
+        footer a {color: #4cc9f0; text-decoration: none;}
+        @media (max-width:900px) {.main-content{max-width:98vw;padding:0 4vw 24px 4vw;}.video-center video, .image-left img{max-width:96vw;}.desc-image-row{gap:16px;}.anime-card{width:42vw;min-width:160px;}}
+        @media (max-width:700px) {.desc-image-row{flex-direction:column;align-items:stretch;gap:20px;}.image-left{justify-content:center;}.description{max-width:100%;font-size:1rem;}.anime-card{width:90vw;min-width:72vw;}}
+        @media (max-width:600px) {header{padding:10px 7px;}.main-content{padding:0 2vw 10px 2vw;}h1{font-size:1.5rem;}.image-left img{max-width:90vw;height:200px;}.recommend-list{flex-direction:column;gap:18px;}.anime-card{width:100%;min-width:0;}}
+    </style>
+</head>
+<body>
+    <header>
+        <a href="Assassingodk.html" class="logo"><i class="fas fa-infinity"></i>Anime.</a>
+        <nav class="navbar" id="navbar">
+            <a href="Assassingodk.html">home</a>
+            <a href="page2.html" class="active">anime</a>
+            <a href="#action">action</a>
+            <a href="#manga">manga</a>
+            <a href="#movies">movies</a>
+        </nav>
+        <div class="icons">
+            <span class="menu-icon" id="menu-bars">&#9776;</span>
+            <span class="search-icon" id="search-icons" style="cursor: pointer;"><i class="fas fa-search"></i></span>
+            <span id="favorites-btn" role="button" aria-label="Favorites" style="cursor: pointer; position:relative; z-index:110;"><i id="favorites-icon" class="far fa-heart"></i></span>
+            <span id="user-icon" role="button" aria-label="User account" style="cursor: pointer; position:relative; z-index:110;"><i class="fas fa-user-circle"></i></span>
+        </div>
+        <div id="user-menu" class="user-menu" aria-hidden="true">
+            <div id="user-menu-content"></div>
+        </div>
+        <div class="search-bar" id="search-bar">
+            <div class="search-input-wrapper">
+                <input type="text" id="search-input" placeholder="Search anime...">
+                <button onclick="searchAnime()">Go</button>
+            </div>
+            <div class="search-suggestions" id="search-suggestions"></div>
+        </div>
+    </header>
+    <main>
+        <div class="main-content">
+            <h1>Attack on Titan</h1>
+            <div class="video-center">
+                <video id="videoPlayer" controls>
+                    <source src="" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div id="episode-title"></div>
+            <div class="desc-image-row">
+                <div class="image-left">
+                    <img src="aot.jpg" alt="Attack on Titan">
+                </div>
+                <div class="description">
+                    Attack on Titan (Shingeki no Kyojin) is a popular anime and manga series set in a world where humanity is on the brink of extinction due to giant humanoid creatures known as Titans. The story follows Eren Yeager and his friends as they fight to survive and uncover the mysteries behind the Titans.
+                </div>
+            </div>
+            <div class="button-section">
+                <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:12px;">
+                    <label for="ep-jump" style="color:#eee;">Jump to episode:</label>
+                    <input id="ep-jump" type="number" min="1" max="94" style="width:74px;padding:6px 3px;border-radius:6px;border:none;outline:none;font-size:1rem;background:#232531;color:#fff;">
+                    <button onclick="jumpToEpisode()" style="background:#4cc9f0;color:white;padding:8px 14px;border:none;border-radius:6px;font-weight:600;cursor:pointer;">Go</button>
+                </div>
+                <div class="episode-range-buttons">
+                  <button class="range-btn active" data-range="season-1">Season 1</button>
+                  <button class="range-btn" data-range="season-2">Season 2</button>
+                  <button class="range-btn" data-range="season-3">Season 3</button>
+                  <button class="range-btn" data-range="season-4">Season 4 Part 1</button>
+                  <button class="range-btn" data-range="season-5">Season 4 Part 2</button>
+                </div>
+                <div id="episodes-season-1" class="episode-group active">
+                    <button class="button" onclick="playVideo('uploads/aot_ep1.mp4', 'Episode 1: To You, in 2000 Years: The Fall of Shiganshina, Part 1')">ep 1</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep2.mp4', 'Episode 2: That Day: The Fall of Shiganshina, Part 2')">ep 2</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep3.mp4', 'Episode 3: A Dim Light Amid Despair: Humanity\'s Comeback, Part 1')">ep 3</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep4.mp4', 'Episode 4: The Struggle for Trost, Part 1')">ep 4</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep5.mp4', 'Episode 5: The Struggle for Trost, Part 2')">ep 5</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep6.mp4', 'Episode 6: The World the Girl Saw: The Struggle for Trost, Part 3')">ep 6</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep7.mp4', 'Episode 7: Small Blade: The Struggle for Trost, Part 4')">ep 7</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep8.mp4', 'Episode 8: I Can Hear His Heartbeat: The Struggle for Trost, Part 5')">ep 8</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep9.mp4', 'Episode 9: Whereabouts of His Left Arm: The Struggle for Trost, Part 6')">ep 9</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep10.mp4', 'Episode 10: Mystery of His Disappearance: The Struggle for Trost, Part 7')">ep 10</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep11.mp4', 'Episode 11: Charge: The Struggle for Trost, Part 8')">ep 11</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep12.mp4', 'Episode 12: Wounds: The Struggle for Trost, Part 9')">ep 12</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep13.mp4', 'Episode 13: The Sudden Visitor: The Torturous Curse of Youth')">ep 13</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep14.mp4', 'Episode 14: Peace: The First Interior Squad')">ep 14</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep15.mp4', 'Episode 15: Humanity\'s Comeback, Part 2')">ep 15</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep16.mp4', 'Episode 16: Warrior')">ep 16</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep17.mp4', 'Episode 17: Female Titan')">ep 17</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep18.mp4', 'Episode 18: Forest of Giant Trees')">ep 18</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep19.mp4', 'Episode 19: Earthbound Illusions')">ep 19</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep20.mp4', 'Episode 20: Erwin Smith')">ep 20</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep21.mp4', 'Episode 21: Bite: The Final Battle for Trost')">ep 21</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep22.mp4', 'Episode 22: Peace')">ep 22</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep23.mp4', 'Episode 23: Smile')">ep 23</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep24.mp4', 'Episode 24: The Defeat of the Colossal Titan')">ep 24</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep25.mp4', 'Episode 25: The Sudden Night Attack')">ep 25</button>
+                </div>
+                <div id="episodes-season-2" class="episode-group">
+                    <button class="button" onclick="playVideo('uploads/aot_ep26.mp4', 'Episode 26: The Beast Titan')">ep 26</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep27.mp4', 'Episode 27: I\'m Home')">ep 27</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep28.mp4', 'Episode 28: Southwestward')">ep 28</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep29.mp4', 'Episode 29: Midnight Sun')">ep 29</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep30.mp4', 'Episode 30: Soldier')">ep 30</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep31.mp4', 'Episode 31: Pain')">ep 31</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep32.mp4', 'Episode 32: Mercy')">ep 32</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep33.mp4', 'Episode 33: Smoke Signal')">ep 33</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep34.mp4', 'Episode 34: Old Story')">ep 34</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep35.mp4', 'Episode 35: Wish')">ep 35</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep36.mp4', 'Episode 36: Ruler')">ep 36</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep37.mp4', 'Episode 37: Scream')">ep 37</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep38.mp4', 'Episode 38: Bright Light')">ep 38</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep39.mp4', 'Episode 39: Disgrace')">ep 39</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep40.mp4', 'Episode 40: Charge')">ep 40</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep41.mp4', 'Episode 41: Split - The Torturous Curse of Youth, Part 2')">ep 41</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep42.mp4', 'Episode 42: Levi')">ep 42</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep43.mp4', 'Episode 43: Night of the Ceremony')">ep 43</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep44.mp4', 'Episode 44: Beast Titaness')">ep 44</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep45.mp4', 'Episode 45: Midnight Train')">ep 45</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep46.mp4', 'Episode 46: The Definition of Insanity')">ep 46</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep47.mp4', 'Episode 47: Descent')">ep 47</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep48.mp4', 'Episode 48: Outside the Walls of Orvud District')">ep 48</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep49.mp4', 'Episode 49: Midnight Sun 2')">ep 49</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep50.mp4', 'Episode 50: Pride')">ep 50</button>
+                </div>
+                <div id="episodes-season-3" class="episode-group">
+                    <button class="button" onclick="playVideo('uploads/aot_ep51.mp4', 'Episode 51: Smoke Signal')">ep 51</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep52.mp4', 'Episode 52: The Politics of Survival')">ep 52</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep53.mp4', 'Episode 53: Friends')">ep 53</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep54.mp4', 'Episode 54: The State of Collapse')">ep 54</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep55.mp4', 'Episode 55: Assault on the Stronghold')">ep 55</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep56.mp4', 'Episode 56: Night of the End')">ep 56</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep57.mp4', 'Episode 57: Hero')">ep 57</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep58.mp4', 'Episode 58: Perfect Game')">ep 58</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep59.mp4', 'Episode 59: Descent: The Lights of Humanity')">ep 59</button>
+                </div>
+                <div id="episodes-season-4" class="episode-group">
+                    <button class="button" onclick="playVideo('uploads/aot_ep60.mp4', 'Episode 60: The Rumbling')">ep 60</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep61.mp4', 'Episode 61: Judgment')">ep 61</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep62.mp4', 'Episode 62: Traitor\'s Return')">ep 62</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep63.mp4', 'Episode 63: Descent')">ep 63</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep64.mp4', 'Episode 64: From One Hand to Another')">ep 64</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep65.mp4', 'Episode 65: Sole Salvation')">ep 65</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep66.mp4', 'Episode 66: The War Hammer Titan')">ep 66</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep67.mp4', 'Episode 67: Assault')">ep 67</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep68.mp4', 'Episode 68: Split')">ep 68</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep69.mp4', 'Episode 69: The Puppet Master')">ep 69</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep70.mp4', 'Episode 70: Retrospective')">ep 70</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep71.mp4', 'Episode 71: Attack')">ep 71</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep72.mp4', 'Episode 72: Brave Volunteers')">ep 72</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep73.mp4', 'Episode 73: Explosion')">ep 73</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep74.mp4', 'Episode 74: Thunderspears')">ep 74</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep75.mp4', 'Episode 75: Midnight Train')">ep 75</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep76.mp4', 'Episode 76: The Dawn of Humanity')">ep 76</button>
+                </div>
+                <div id="episodes-season-5" class="episode-group">
+                    <button class="button" onclick="playVideo('uploads/aot_ep77.mp4', 'Episode 77: Sneak Attack')">ep 77</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep78.mp4', 'Episode 78: Two Brothers')">ep 78</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep79.mp4', 'Episode 79: Memories of the Future')">ep 79</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep80.mp4', 'Episode 80: A Sound Argument')">ep 80</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep81.mp4', 'Episode 81: Sunset')">ep 81</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep82.mp4', 'Episode 82: Basement')">ep 82</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep83.mp4', 'Episode 83: An Honest Soldier')">ep 83</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep84.mp4', 'Episode 84: Alone & Unafraid')">ep 84</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep85.mp4', 'Episode 85: Night of the End')">ep 85</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep86.mp4', 'Episode 86: The Final Chapters Special: Lost Girls')">ep 86</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep87.mp4', 'Episode 87: Rumbling')">ep 87</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep88.mp4', 'Episode 88: The Rumbling Continues')">ep 88</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep89.mp4', 'Episode 89: A Sound Argument Part 2')">ep 89</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep90.mp4', 'Episode 90: Hope')">ep 90</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep91.mp4', 'Episode 91: Toward the Tree on the Hill')">ep 91</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep92.mp4', 'Episode 92: The Final Chapters Part 1')">ep 92</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep93.mp4', 'Episode 93: The Final Chapters Part 2')">ep 93</button>
+                    <button class="button" onclick="playVideo('uploads/aot_ep94.mp4', 'Episode 94: The Final Chapters Epilogue')">ep 94</button>
+                </div>
+            </div>
+            
+            <!-- Comments Section -->
+            <section class="comments-section">
+                <h2 style="color: #4cc9f0; margin-top: 40px; font-size: 1.8rem;">Comments</h2>
+                <div class="comments-container">
+                    <div class="comment-form">
+                        <textarea id="comment-text" placeholder="Share your thoughts about this anime..." style="width: 100%; height: 100px; padding: 12px; border-radius: 8px; border: 1px solid #4cc9f0; background: #232531; color: #fff; font-family: 'Segoe UI', Arial; resize: vertical;"></textarea>
+                        <button onclick="addComment()" style="background: #4cc9f0; color: #fff; border: none; padding: 10px 20px; margin-top: 10px; border-radius: 8px; cursor: pointer; font-weight: 600;">Post Comment</button>
+                    </div>
+                    <div id="comments-list" style="margin-top: 20px;">
+                        <!-- Comments will appear here -->
+                    </div>
+                </div>
+            </section>
+            
+            <div style="text-align: center; margin: 40px 0;">
+                <button onclick="document.getElementById('recommend-section').scrollIntoView({ behavior: 'smooth' })" style="background: #4cc9f0; color: #fff; border: none; padding: 12px 28px; font-size: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s;">
+                    <i class="fas fa-heart"></i> View Recommended Anime
+                </button>
+            </div>
+            
+            <div class="recommend-section" id="recommend-section">
+                <div class="recommend-title">Recommended Anime</div>
+                <div class="recommend-list">
+                    <div class="anime-card">
+                        <a href="onepiece.html"><img src="download.jpg" alt="One Piece"></a>
+                        <h3>One Piece</h3>
+                        <p>Pirates search for the legendary treasure.</p>
+                    </div>
+                    <div class="anime-card">
+                        <a href="naruto.html"><img src="naruto.jpg" alt="Naruto"></a>
+                        <h3>Naruto</h3>
+                        <p>A ninja's journey to become Hokage.</p>
+                    </div>
+                    <div class="anime-card">
+                        <a href="bleach.html"><img src="bleach.jpg" alt="Bleach"></a>
+                        <h3>Bleach</h3>
+                        <p>Ichigo battles evil spirits as a Soul Reaper.</p>
+                    </div>
+                    <div class="anime-card">
+                        <a href="danmachi.html"><img src="danmachi.jpg" alt="Danmachi"></a>
+                        <h3>Danmachi</h3>
+                        <p>Adventures in the dungeon city of Orario.</p>
+                    </div>
+                    <div class="anime-card">
+    <a href="boruto.html"><img src="boruto.jpg" alt="Boruto"></a>
+    <h3>Boruto: Naruto Next Generations</h3>
+    <p>The next generation of shinobi fights to protect Hidden Leaf Village.</p>
+</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div>
+
+            Owned and operated by koushik vardhan | 
+            <a href="tel:9390956911" style="color:#4cc9f0;">9390956911</a> | 
+            <a href="mailto:koushikvardhan2006@gmail.com" style="color:#4cc9f0;">koushikvardhan2006@gmail.com</a> | 
+            <span>andhra pradesh, india - 533005</span>
+        </div>
+    </footer>
+    <script>
+        // Navbar mobile toggle
+        const menuBars = document.getElementById('menu-bars');
+        const navbar = document.getElementById('navbar');
+        if (menuBars && navbar) {
+            menuBars.onclick = function(e) {
+                e.stopPropagation();
+                navbar.classList.toggle('show');
+            };
+            document.addEventListener('click', function(e) {
+                if (!navbar.contains(e.target) && !menuBars.contains(e.target)) {
+                    navbar.classList.remove('show');
+                }
+            });
+        }
+        // Optional: Toggle search icon effect
+        // Search functionality
+        const searchIcon = document.getElementById('search-icons');
+        const searchBar = document.getElementById('search-bar');
+        if (searchIcon) {
+            searchIcon.onclick = function(e) {
+                e.stopPropagation();
+                searchBar.classList.toggle('active');
+                if (searchBar.classList.contains('active')) {
+                    document.getElementById('search-input').focus();
+                }
+            };
+        }
+        function searchAnime() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            if (!query) return;
+            const animeMap = {
+                'naruto': 'naruto.html',
+                'bleach': 'bleach.html',
+                'danmachi': 'danmachi.html',
+                'aot': 'aot.html',
+                'attack on titan': 'aot.html',
+                'onepiece': 'onepiece.html',
+                'one piece': 'onepiece.html',
+                'boruto': 'boruto.html',
+                'deathnote': 'deathnote.html',
+                'demon slayer': 'demonslayer.html',
+                'solo leveling': 'sololeveling.html',
+                'fairy tail': 'fairytail.html',
+                'one punchman': 'onepunchman.html',
+                'jojo': 'jojo.html',
+                'dragonball': 'dragonball.html',
+                'my hero academia': 'myheroacademia.html',
+                'hunter x hunter': 'hunterxhunter.html',
+                'black clover': 'blackclover.html'
+            };
+            if (animeMap[query]) {
+                window.location.href = animeMap[query];
+            } else {
+                alert('Anime not found. Try: naruto, bleach, danmachi, aot, or onepiece');
+            }
+        }
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchAnime();
+        });
+        document.addEventListener('click', function(e) {
+            if (!searchBar.contains(e.target) && e.target !== searchIcon) {
+                searchBar.classList.remove('active');
+                document.getElementById('search-suggestions').classList.remove('show');
+            }
+        });
+        // Autocomplete functionality with cards
+        const animeData = {
+            'naruto': { title: 'Naruto', img: 'naruto.jpg', url: 'naruto.html', alias: ['naruto'] },
+            'bleach': { title: 'Bleach', img: 'bleach.jpg', url: 'bleach.html', alias: ['bleach'] },
+            'danmachi': { title: 'Danmachi', img: 'danmachi.jpg', url: 'danmachi.html', alias: ['danmachi'] },
+            'aot': { title: 'Attack on Titan', img: 'aot.jpg', url: 'aot.html', alias: ['aot', 'attack on titan'] },
+            'onepiece': { title: 'One Piece', img: 'download.jpg', url: 'onepiece.html', alias: ['onepiece', 'one piece'] },
+            'boruto': { title: 'Boruto', img: 'boruto.jpg', url: 'boruto.html', alias: ['boruto'] }
+        };
+        
+        const searchInput = document.getElementById('search-input');
+        const suggestionsDiv = document.getElementById('search-suggestions');
+        
+        searchInput.addEventListener('input', function() {
+            const value = this.value.toLowerCase().trim();
+            suggestionsDiv.innerHTML = '';
+            
+            if (value.length === 0) {
+                suggestionsDiv.classList.remove('show');
+                return;
+            }
+            
+            // Filter anime by title or alias
+            const filtered = Object.entries(animeData).filter(([key, anime]) => 
+                anime.title.toLowerCase().includes(value) || 
+                anime.alias.some(alias => alias.startsWith(value))
+            );
+            
+            if (filtered.length === 0) {
+                suggestionsDiv.classList.remove('show');
+                return;
+            }
+            
+            suggestionsDiv.classList.add('show');
+            filtered.forEach(([key, anime]) => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `<img src="${anime.img}" alt="${anime.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22%3E%3Crect fill=%22%23333%22 width=%22120%22 height=%22120%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'"><div class="suggestion-title">${anime.title}</div>`;
+                item.onclick = function(e) {
+                    e.stopPropagation();
+                    window.location.href = anime.url;
+                };
+                suggestionsDiv.appendChild(item);
+            });
+        });
+        // Play video and show episode title
+        function playVideo(src, title) {
+            var videoPlayer = document.getElementById("videoPlayer");
+            videoPlayer.src = src;
+            videoPlayer.play();
+            document.getElementById('episode-title').textContent = title;
+        }
+        // Load comments from localStorage
+        function loadComments() {
+            const comments = JSON.parse(localStorage.getItem('aot-comments')) || [];
+            const commentsList = document.getElementById('comments-list');
+            commentsList.innerHTML = '';
+            comments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.style.cssText = 'background: #232531; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #4cc9f0;';
+                commentDiv.innerHTML = `
+                    <p style="margin: 0 0 8px 0; color: #4cc9f0; font-weight: bold;">${comment.date}</p>
+                    <p style="margin: 0; color: #fff;">${comment.text}</p>
+                `;
+                commentsList.appendChild(commentDiv);
+            });
+        }
+        // Add new comment
+        function addComment() {
+            const text = document.getElementById('comment-text').value.trim();
+            if (!text) {
+                alert('Please write a comment!');
+                return;
+            }
+            const comments = JSON.parse(localStorage.getItem('aot-comments')) || [];
+            const now = new Date().toLocaleString();
+            comments.unshift({ text, date: now });
+            localStorage.setItem('aot-comments', JSON.stringify(comments));
+            document.getElementById('comment-text').value = '';
+            loadComments();
+        }
+        // Load comments on page load
+        window.addEventListener('DOMContentLoaded', loadComments);
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.range-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelectorAll('.episode-group').forEach(g => g.classList.remove('active'));
+                    document.getElementById('episodes-' + this.dataset.range).classList.add('active');
+                });
+            });
+        });
+        // Jump to episode function
+        function jumpToEpisode() {
+            const ep = parseInt(document.getElementById('ep-jump').value);
+            if (isNaN(ep) || ep < 1 || ep > 94) {
+                alert('Enter a valid episode number (1â€“94).');
+                return;
+            }
+            
+            let season;
+            if (ep <= 25) season = 'season-1';
+            else if (ep <= 50) season = 'season-2';
+            else if (ep <= 59) season = 'season-3';
+            else if (ep <= 76) season = 'season-4';
+            else season = 'season-5';
+            
+            document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.episode-group').forEach(g => g.classList.remove('active'));
+            document.querySelector(`.range-btn[data-range="${season}"]`).classList.add('active');
+            document.getElementById(`episodes-${season}`).classList.add('active');
+            
+            const btn = document.querySelector(`.button[onclick*="ep${ep}.mp4"]`);
+            if (btn) btn.click();
+        }
+        document.getElementById('ep-jump').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                jumpToEpisode();
+            }
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <script>
+    (function() {
+        let lastScroll = 0;
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', function() {
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+            if (!header) return;
+            if (currentScroll > lastScroll && currentScroll > 60) {
+                header.classList.add('navbar-hidden');
+            } else {
+                header.classList.remove('navbar-hidden');
+            }
+            lastScroll = currentScroll;
+        }, { passive: true });
+    })();
+    </script>
+    <script>
+    // Add favorites heart to anime cards
+    (function(){
+      function loadFavorites(){
+        try{ return JSON.parse(localStorage.getItem('favorites')||'[]'); }catch(e){ return []; }
+      }
+      function saveFavorites(list){ localStorage.setItem('favorites', JSON.stringify(list||[])); }
+      function isFavorited(url){ const list = loadFavorites(); return !!list.find(f=>f.url === url); }
+      
+      document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('.anime-card').forEach(card=>{
+          if(card.querySelector('.card-fav')) return;
+          const link = card.querySelector('a[href]');
+          if(!link) return;
+          const url = link.getAttribute('href');
+          const h = card.querySelector('h3');
+          const title = h ? h.textContent.trim() : url;
+          
+          const btn = document.createElement('button');
+          btn.className = isFavorited(url) ? 'card-fav' : 'card-fav not-fav';
+          btn.innerHTML = '<i class="' + (isFavorited(url) ? 'fas' : 'far') + ' fa-heart"></i>';
+          btn.style.cssText = 'position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.5);border:none;padding:6px;border-radius:8px;cursor:pointer;z-index:50;';
+          
+          btn.addEventListener('click', function(e){
+            e.preventDefault(); 
+            e.stopPropagation();
+            const list = loadFavorites();
+            const idx = list.findIndex(f=>f.url===url);
+            if(idx>=0){
+              list.splice(idx, 1);
+              btn.classList.add('not-fav');
+              btn.innerHTML = '<i class="far fa-heart"></i>';
+            } else {
+              list.unshift({ title, url });
+              btn.classList.remove('not-fav');
+              btn.innerHTML = '<i class="fas fa-heart"></i>';
+            }
+            saveFavorites(list);
+          });
+          
+          card.style.position = 'relative';
+          card.insertBefore(btn, card.firstChild);
+        });
+      });
+    })();
+    
+    // Favorites button navigation
+    const favoritesBtn = document.getElementById('favorites-btn');
+    if (favoritesBtn) {
+      favoritesBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'favorites.html';
+      });
+    }
+
+    // User login/logout functionality
+    const userIcon = document.getElementById('user-icon');
+    const userMenu = document.getElementById('user-menu');
+    const userMenuContent = document.getElementById('user-menu-content');
+
+    function updateUserMenu() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser && currentUser.loggedIn) {
+            userMenuContent.innerHTML = `
+                <div class="user-menu-item" style="padding:10px;border-bottom:1px solid #4cc9f0;color:#4cc9f0;font-weight:600;">
+                    Welcome, ${currentUser.username}!
+                </div>
+                <button id="logoutBtn" style="width:100%;padding:10px;background:#ff7b9a;border:none;color:#fff;cursor:pointer;font-weight:600;border-radius:4px;">Logout</button>
+            `;
+            setTimeout(() => {
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', logout);
+                }
+            }, 0);
+        } else {
+            userMenuContent.innerHTML = `
+                <a href="login.html" style="display:block;padding:10px;color:#4cc9f0;text-decoration:none;text-align:center;border-bottom:1px solid #4cc9f0;font-weight:600;">Login</a>
+                <a href="sign up.html" style="display:block;padding:10px;color:#4cc9f0;text-decoration:none;text-align:center;font-weight:600;">Sign Up</a>
+            `;
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('rememberMe');
+        updateUserMenu();
+        userMenu.classList.remove('show');
+        window.location.href = window.location.href;
+    }
+
+    if (userIcon && userMenu) {
+        userIcon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userMenu.classList.toggle('show');
+            if (userMenu.classList.contains('show')) {
+                userMenu.setAttribute('aria-hidden', 'false');
+            } else {
+                userMenu.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!userMenu.contains(e.target) && e.target !== userIcon && !userIcon.contains(e.target)) {
+                userMenu.classList.remove('show');
+                userMenu.setAttribute('aria-hidden', 'true');
+            }
+        });
+    }
+
+    updateUserMenu();
+    </script>
+    <script src="favorites.js"></script>
+</body>
+</html>

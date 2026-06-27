@@ -1,0 +1,795 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Naruto</title>
+    <link rel="stylesheet" href="Assassingodk1.css">
+    <style>
+        html, body { background: #181a20; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; height: 100%; width: 100%; }
+        header { width: 100%; padding: 20px 40px; background: #1c1f26; display: flex; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.1);}
+        .logo { color: #4cc9f0; font-size: 2rem; text-decoration: none; font-weight: bold; display: flex; align-items: center;}
+        .logo i { margin-right: 8px; }
+        .navbar { display: none; flex-direction: column; gap: 20px; background: #232531; position: absolute; top: 70px; right: 40px; border-radius: 10px; padding: 20px; min-width: 150px; box-shadow: 0 4px 12px rgba(0,0,0,0.22); z-index: 2000;}
+        .navbar.show { display: flex; }
+        .navbar a { color: #fff; text-decoration: none; font-size: 1.1rem; font-weight: 500; padding: 8px 12px; border-radius: 4px; transition: background 0.2s;}
+        .navbar a.active, .navbar a:hover { background: #4cc9f0; color: #fff; }
+        .icons { display: flex; align-items: center; gap: 18px; font-size: 1.5rem; color: #fff; }
+        .search-bar { display: none; flex-direction: column; gap: 8px; background: #232531; padding: 8px 12px; border-radius: 8px; border: 1px solid #4cc9f0; position: absolute; top: 70px; right: 40px; z-index: 1999; }
+        .search-bar.active { display: flex !important; }
+        .search-bar input { background: transparent; border: none; color: #fff; outline: none; width: 180px; font-size: 1rem; }
+        .search-bar input::placeholder { color: #999; }
+        .search-bar button { background: #4cc9f0; border: none; color: #000; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .search-bar button:hover { background: #38b0d8; }
+        .search-input-wrapper { display: flex; align-items: center; gap: 8px; }
+        .search-suggestions { display: none; max-height: 200px; overflow-y: auto; border-top: 1px solid #4cc9f0; margin-top: 8px; }
+        .search-suggestions.show { display: block; }
+        .suggestion-item { padding: 8px 12px; color: #fff; cursor: pointer; border-bottom: 1px solid #333; }
+        .suggestion-item:hover { background: #4cc9f0; color: #000; }
+        .search-icon { cursor: pointer; }
+        .menu-icon { font-size: 2rem; cursor: pointer; color: #4cc9f0; }
+        main { width: 100vw; min-height: 100vh; box-sizing: border-box; padding-top: 110px; }
+        .main-content { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 40px 40px 40px; display: flex; flex-direction: column; }
+        h1 { color: #4cc9f0; margin-bottom: 28px; font-size: 2.7rem; font-weight: 900; letter-spacing: 2px; text-shadow: 2px 2px 0 #000, 0 2px 12px #4cc9f088; }
+        .video-center { display: flex; justify-content: center; width: 100%; margin-bottom: 32px; }
+        video { width: 100%; max-width: 650px; height: auto; object-fit: contain; border-radius: 10px; background: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.15);}
+        #episode-title { margin: 16px 0 18px 0; font-size: 1.3rem; color: #4cc9f0; font-weight: bold; min-height: 24px; text-align: center; text-shadow: 1px 1px 0 #000, 0 2px 8px #4cc9f088; }
+        .desc-image-row { display: flex; flex-direction: row; gap: 32px; width: 100%; align-items: flex-start; margin-bottom: 30px; }
+        .image-left { flex: 0 0 220px; display: flex; justify-content: flex-start; align-items: flex-start; }
+        .image-left img { width: 180px; height: 260px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.16); display: block; }
+        .description { flex: 1; color: #ececec; font-size: 1.13rem; max-width: 700px; text-align: left; align-self: stretch; display: flex; align-items: center; }
+        .button-section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; margin-top: 8px; }
+        .episode-range-buttons { display: flex; gap: 10px; margin-bottom: 18px; justify-content: center; }
+        .range-btn { background: #4cc9f0; color: #fff; border: none; padding: 10px 22px; font-size: 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.18s, color 0.18s, transform 0.15s; outline: none; box-shadow: 0 2px 8px #0002;}
+        .range-btn.active, .range-btn:hover { background: #38b0d8; color: #fff; transform: translateY(-2px) scale(1.06); box-shadow: 0 2px 8px #4cc9f088;}
+        .episode-group { display: none; flex-wrap: wrap; gap: 10px; margin-top: 10px;}
+
+        /* Stylish horizontal scrollbar for episode groups with >50 episodes */
+        .episode-group {
+            flex-wrap: nowrap;   /* make buttons scroll horizontally, not wrap */
+            overflow-x: auto;    /* enables horizontal scrollbar */
+            max-width: 100%;
+            padding-bottom: 8px;
+
+            scrollbar-width: thin;
+            scrollbar-color: #4cc9f0 #232531;
+        }
+        .episode-group::-webkit-scrollbar {
+            height: 8px;
+        }
+        .episode-group::-webkit-scrollbar-thumb {
+            background: #4cc9f0;
+            border-radius: 5px;
+        }
+        .episode-group::-webkit-scrollbar-track {
+            background: #232531;
+            border-radius: 5px;
+        }
+
+        .episode-group.active { display: flex; }
+        .button { background-color: #4cc9f0; border: none; color: white; padding: 10px 20px; font-size: 16px; border-radius: 6px; transition: background 0.2s, transform 0.15s; cursor: pointer; font-weight: 500; box-shadow: 0 2px 6px rgba(0,0,0,0.12);}
+        .button:hover { background-color: #38b0d8; transform: translateY(-2px) scale(1.04);}
+        .button:active { background-color: #2d98a8; transform: scale(0.98);}
+        .recommend-section { margin-top: 32px; }
+        .recommend-title { color: #4cc9f0; font-size: 1.5rem; font-weight: bold; margin-bottom: 18px; }
+        .recommend-list { display: flex; flex-wrap: wrap; gap: 26px; width: 100%; justify-content: flex-start;}
+        .anime-card { background: rgba(24,24,24,0.8); border-radius: 12px; padding: 18px 16px; width: 185px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.16); transition: transform 0.18s;}
+        .anime-card:hover { transform: translateY(-4px) scale(1.03);}
+        .anime-card img { width: 130px; height: 180px; object-fit: cover; border-radius: 10px;}
+        .anime-card h3 { color: #4cc9f0; font-size: 1.05rem; margin: 10px 0 6px 0;}
+        .anime-card p { color: #ddd; font-size: 0.97rem; margin: 0;}
+        @media (max-width: 900px) {
+            .main-content { max-width: 98vw; padding: 0 4vw 24px 4vw;}
+            .video-center video, .image-left img { max-width: 96vw;}
+            .desc-image-row { gap: 16px; }
+            .anime-card { width: 42vw; min-width: 160px;}
+        }
+        @media (max-width: 700px) {
+            .desc-image-row { flex-direction: column; align-items: stretch; gap: 20px;}
+            .image-left { justify-content: center; }
+            .description { max-width: 100%; font-size: 1rem;}
+            .anime-card { width: 90vw; min-width: 72vw;}
+        }
+        @media (max-width: 600px) {
+            header { padding: 10px 7px; }
+            .main-content { padding: 0 2vw 10px 2vw;}
+            h1 { font-size: 1.5rem; }
+            .image-left img { max-width: 90vw; height: 200px;}
+            .recommend-list { flex-direction: column; gap: 18px;}
+            .anime-card { width: 100%; min-width: 0;}
+            .episode-group { gap: 6px; padding-bottom: 6px;}
+        }
+    </style>
+    <link rel="stylesheet" href="boruto-theme.css">
+</head>
+<body>
+ <header>
+        <a href="Assassingodk.html" class="logo"><i class="fas fa-infinity"></i>Anime.</a>
+        <nav class="navbar" id="navbar">
+            <a href="Assassingodk.html">home</a>
+            <a href="page2.html" class="active">anime</a>
+            <a href="#action">action</a>
+            <a href="#manga">manga</a>
+            <a href="#movies">movies</a>
+        </nav>
+        <div class="icons">
+            <span class="menu-icon" id="menu-bars">&#9776;</span>
+            <span class="search-icon" id="search-icons" style="cursor: pointer;"><i class="fas fa-search"></i></span>
+            <span id="favorites-btn" role="button" aria-label="Favorites" style="cursor: pointer; position:relative; z-index:110;"><i id="favorites-icon" class="far fa-heart"></i></span>
+            <span id="user-icon" role="button" aria-label="User account" style="cursor: pointer; position:relative; z-index:110;"><i class="fas fa-user-circle"></i></span>
+        </div>
+        <div id="user-menu" class="user-menu" aria-hidden="true">
+            <div id="user-menu-content"></div>
+        </div>
+        <div class="search-bar" id="search-bar">
+            <div class="search-input-wrapper">
+                <input type="text" id="search-input" placeholder="Search anime...">
+                <button onclick="searchAnime()">Go</button>
+            </div>
+            <div class="search-suggestions" id="search-suggestions"></div>
+        </div>
+    </header>
+    <main>
+        <div class="main-content">
+            <h1>Naruto</h1>
+            <div class="video-center">
+                <video id="videoPlayer" controls>
+                    <source src="" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div id="episode-title"></div>
+            <div class="desc-image-row">
+                <div class="image-left">
+                    <img src="naruto.jpg" alt="Naruto">
+                </div>
+                <div class="description">
+                    Naruto is a Japanese manga series written and illustrated by Masashi Kishimoto. The story follows Naruto Uzumaki, a young ninja with a sealed demon fox spirit within him, as he seeks recognition from his peers and dreams of becoming the Hokage, the leader of his village.
+                </div>
+            </div>
+            <div class="button-section">
+                <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:12px;">
+    <label for="ep-jump" style="color:#eee;">Jump to episode:</label>
+    <input id="ep-jump" type="number" min="1" max="220" style="width:74px;padding:6px 3px;border-radius:6px;border:none;outline:none;font-size:1rem;background:#232531;color:#fff;">
+    <button onclick="jumpToEpisode()" style="background:#4cc9f0;color:white;padding:8px 14px;border:none;border-radius:6px;font-weight:600;cursor:pointer;">Go</button>
+</div>
+                <div class="episode-range-buttons">
+                    <button class="range-btn active" data-range="1-100">1-100</button>
+                    <button class="range-btn" data-range="101-200">101-200</button>
+                    <button class="range-btn" data-range="201-220">201-220</button>
+                </div>
+                <div id="episodes-1-100" class="episode-group active">
+                    <!-- Episodes 1-100 -->
+                    <!-- AUTO-GENERATED BUTTONS -->
+                    <!-- For brevity, only a sample is shown here, but for your file, generate one button per episode, 1-100 -->
+                    <!-- Example: -->
+                    <!--
+                    <button class="button" onclick="playVideo('uploads/naruto_ep1.mp4', 'Episode 1: Enter Naruto Uzumaki!')">ep 1</button>
+                    <button class="button" onclick="playVideo('uploads/naruto_ep2.mp4', 'Episode 2: My Name is Konohamaru!')">ep 2</button>
+                    ... up to ep 100 ...
+                    -->
+                    <!-- Below is a minimal sample; you must expand this in your file for all episodes -->
+                    <button class="button" onclick="playVideo('naruto videos/Naruto 1 Enter Naruto Uzumaki.mp4', 'Episode 1: Enter Naruto Uzumaki!')">ep 1</button>
+                    <button class="button" onclick="playVideo('naruto videos/Naruto 2 My Name is Konohamaru.mp4', 'Episode 2: My Name is Konohamaru!')">ep 2</button>
+                    <button class="button" onclick="playVideo('naruto videos/Naruto 3 Sasuke and Sakura Friends or Foes.mp4', 'Episode 3: Sasuke and Sakura Friends or Foes?')">ep 3</button>
+                    <button class="button" onclick="playVideo('naruto videos/Naruto 4 Pass or Fail Survival Test.mp4', 'Episode 4: Pass or Fail Survival Test')">ep 4</button>
+                    <button class="button" onclick="playVideo('naruto videos/Naruto 5 You Failed Kakashi\'s Final Decision.mp4', 'Episode 5: You Failed Kakashi\'s Final Decision')">ep 5</button>
+                     <button class="button" onclick="playVideo('uploads/naruto_ep6.mp4', 'Episode 6: A Dangerous Mission! Journey to the Land of Waves!')">ep 6</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep7.mp4', 'Episode 7: The Assassin of the Mist!')">ep 7</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep8.mp4', 'Episode 8: The Oath of Pain')">ep 8</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep9.mp4', 'Episode 9: Kakashi: Sharingan Warrior!')">ep 9</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep10.mp4', 'Episode 10: The Forest of Chakra')">ep 10</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep11.mp4', 'Episode 11: The Land Where a Hero Once Lived')">ep 11</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep12.mp4', 'Episode 12: Battle on the Bridge! Zabuza Returns!')">ep 12</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep13.mp4', 'Episode 13: Haku\'s Secret Jutsu: Crystal Ice Mirrors')">ep 13</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep14.mp4', 'Episode 14: The Number One Hyperactive, Knucklehead Ninja Joins the Fight!')">ep 14</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep15.mp4', 'Episode 15: Zero Visibility: The Sharingan Shatters')">ep 15</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep16.mp4', 'Episode 16: The Broken Seal')">ep 16</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep17.mp4', 'Episode 17: White Past: Hidden Ambition')">ep 17</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep18.mp4', 'Episode 18: The Weapons Known as Shinobi')">ep 18</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep19.mp4', 'Episode 19: The Demon in the Snow')">ep 19</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep20.mp4', 'Episode 20: A New Chapter Begins: The Chunin Exam!')">ep 20</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep21.mp4', 'Episode 21: Identify Yourself: Powerful New Rivals')">ep 21</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep22.mp4', 'Episode 22: Chunin Challenge: Rock Lee vs. Sasuke!')">ep 22</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep23.mp4', 'Episode 23: Genin Takedown! All Nine Rookies Face Off!')">ep 23</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep24.mp4', 'Episode 24: Start Your Engines: The Chunin Exam Begins!')">ep 24</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep25.mp4', 'Episode 25: The Tenth Question: All or Nothing!')">ep 25</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep26.mp4', 'Episode 26: Special Report: Live from the Forest of Death!')">ep 26</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep27.mp4', 'Episode 27: The Chunin Exam Stage 2: The Forest of Death')">ep 27</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep28.mp4', 'Episode 28: Eat or Be Eaten: Panic in the Forest')">ep 28</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep29.mp4', 'Episode 29: Naruto\'s Counterattack: Never Give In!')">ep 29</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep30.mp4', 'Episode 30: The Sharingan Revived: Dragon-Flame Jutsu!')">ep 30</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep31.mp4', 'Episode 31: Bushy Brow\'s Pledge: Undying Love and Protection')">ep 31</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep32.mp4', 'Episode 32: Sakura Blossoms!')">ep 32</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep33.mp4', 'Episode 33: Battle Formation: Ino-Shika-Cho!')">ep 33</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep34.mp4', 'Episode 34: Akamaru Trembles: Gaara\'s Cruel Strength!')">ep 34</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep35.mp4', 'Episode 35: The Scroll\'s Secret: No Peeking Allowed')">ep 35</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep36.mp4', 'Episode 36: Clone vs. Clone: Mine Are Better Than Yours!')">ep 36</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep37.mp4', 'Episode 37: Surviving the Cut! The Rookie Nine Together Again!')">ep 37</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep38.mp4', 'Episode 38: Narrowing the Field: Sudden Death Elimination!')">ep 38</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep39.mp4', 'Episode 39: Bushy Brow\'s Jealousy: Barrage of Lions Unleashed!')">ep 39</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep40.mp4', 'Episode 40: Kakashi and Orochimaru: Face-to-Face!')">ep 40</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep41.mp4', 'Episode 41: Kunoichi Rumble: The Rivals Get Serious!')">ep 41</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep42.mp4', 'Episode 42: The Ultimate Battle: Cha!')">ep 42</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep43.mp4', 'Episode 43: Killer Kunoichi and a Shaky Shikamaru')">ep 43</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep44.mp4', 'Episode 44: Akamaru Unleashed! Who\'s Top Dog Now?')">ep 44</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep45.mp4', 'Episode 45: Surprise Attack! Naruto\'s Secret Weapon!')">ep 45</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep46.mp4', 'Episode 46: Byakugan Battle: Hinata Grows Bold!')">ep 46</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep47.mp4', 'Episode 47: A Failure Stands Tall!')">ep 47</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep48.mp4', 'Episode 48: Gaara vs. Rock Lee: The Power of Youth Explodes!')">ep 48</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep49.mp4', 'Episode 49: Lee\'s Hidden Strength: Forbidden Secret Jutsu!')">ep 49</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep50.mp4', 'Episode 50: The Fifth Gate: A Splendid Ninja is Born')">ep 50</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep51.mp4', 'Episode 51: A Shadow in Darkness: Danger Approaches Sasuke')">ep 51</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep52.mp4', 'Episode 52: Ebisu Returns: Naruto\'s Toughest Training Yet!')">ep 52</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep53.mp4', 'Episode 53: Long Time No See: Jiraiya Returns!')">ep 53</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep54.mp4', 'Episode 54: The Summoning Jutsu: Wisdom of the Toad Sage!')">ep 54</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep55.mp4', 'Episode 55: A Feeling of Yearning, A Flower Full of Hope')">ep 55</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep56.mp4', 'Episode 56: Live or Die: Risk it All to Win it All!')">ep 56</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep57.mp4', 'Episode 57: He Flies! He Jumps! He Lurks! Chief Toad Appears!')">ep 57</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep58.mp4', 'Episode 58: Hospital Besieged: The Evil Hand Revealed!')">ep 58</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep59.mp4', 'Episode 59: The Final Rounds: Rush to the Battle Arena!')">ep 59</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep60.mp4', 'Episode 60: Byakugan vs. Shadow Clone Jutsu!')">ep 60</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep61.mp4', 'Episode 61: Ultimate Defense: Zero Blind Spot!')">ep 61</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep62.mp4', 'Episode 62: A Failure\'s True Power')">ep 62</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep63.mp4', 'Episode 63: Hit It or Quit It: The Final Rounds Get Complicated!')">ep 63</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep64.mp4', 'Episode 64: Zero Motivation: The Guy with Cloud Envy')">ep 64</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep65.mp4', 'Episode 65: Dancing Leaf, Squirming Sand')">ep 65</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep66.mp4', 'Episode 66: Bushy Brow\'s Jutsu: Sasuke Style!')">ep 66</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep67.mp4', 'Episode 67: Late for the Show, But Ready to Go! The Ultimate Secret Technique is Born!')">ep 67</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep68.mp4', 'Episode 68: Zero Hour! The Destruction of the Hidden Leaf Village Begins!')">ep 68</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep69.mp4', 'Episode 69: Village in Distress: A New A-Ranked Mission!')">ep 69</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep70.mp4', 'Episode 70: A Shirker\'s Call to Action: Layabout No More!')">ep 70</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep71.mp4', 'Episode 71: An Unrivaled Match: Hokage Battle Royale!')">ep 71</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep72.mp4', 'Episode 72: A Mistake from the Past: A Face Revealed!')">ep 72</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep73.mp4', 'Episode 73: Forbidden Secret Technique: Reaper Death Seal!')">ep 73</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep74.mp4', 'Episode 74: Astonishing Truth! Gaara\'s Identity Revealed!')">ep 74</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep75.mp4', 'Episode 75: Sasuke\'s Decision: Pushed to the Edge!')">ep 75</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep76.mp4', 'Episode 76: Assassin of the Moonlit Night')">ep 76</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep77.mp4', 'Episode 77: Light vs. Dark: The Two Faces of Gaara')">ep 77</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep78.mp4', 'Episode 78: Naruto\'s Ninja Handbook')">ep 78</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep79.mp4', 'Episode 79: Beyond the Limit of Darkness and Light')">ep 79</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep80.mp4', 'Episode 80: The Third Hokage, Forever...')">ep 80</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep81.mp4', 'Episode 81: Return of the Morning Mist')">ep 81</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep82.mp4', 'Episode 82: Eye to Eye: Sharingan vs. Sharingan!')">ep 82</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep83.mp4', 'Episode 83: Jiraiya: Naruto\'s Potential Disaster')">ep 83</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep84.mp4', 'Episode 84: Roar, Chidori! Brother vs. Brother!')">ep 84</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep85.mp4', 'Episode 85: Hate Among the Uchihas: The Last of the Clan!')">ep 85</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep86.mp4', 'Episode 86: A New Training Begins: I Will Be Strong!')">ep 86</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep87.mp4', 'Episode 87: Keep on Training: Pop Goes the Water Balloon!')">ep 87</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep88.mp4', 'Episode 88: Focal Point: The Mark of the Leaf')">ep 88</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep89.mp4', 'Episode 89: An Impossible Choice: The Pain Within')">ep 89</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep90.mp4', 'Episode 90: Unforgivable! A Total Lack of Respect!')">ep 90</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep91.mp4', 'Episode 91: Inheritance! The Necklace of Death!')">ep 91</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep92.mp4', 'Episode 92: A Dubious Offer! Tsunade\'s Choice')">ep 92</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep93.mp4', 'Episode 93: Breakdown! The Deal is Off!')">ep 93</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep94.mp4', 'Episode 94: Attack! Fury of the Rasengan!')">ep 94</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep95.mp4', 'Episode 95: The Fifth Hokage! A Life on the Line!')">ep 95</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep96.mp4', 'Episode 96: Deadlock! Sannin Showdown!')">ep 96</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep97.mp4', 'Episode 97: Kidnapped! Naruto\'s Hot Spring Adventure!')">ep 97</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep98.mp4', 'Episode 98: Tsunade\'s Warning: Ninja No More!')">ep 98</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep99.mp4', 'Episode 99: The Will of Fire Still Burns!')">ep 99</button>
+                    <!-- ...repeat for all episodes up to ep 100... -->
+                    <button class="button" onclick="playVideo('uploads/naruto_ep100.mp4', 'Episode 100: Sensei and Student: The Bond of the Shinobi')">ep 100</button>
+                </div>
+                <div id="episodes-101-200" class="episode-group">
+                    <!-- Episodes 101-200 -->
+                    <button class="button" onclick="playVideo('uploads/naruto_ep101.mp4', 'Episode 101: Gotta See! Gotta Know! Kakashi-Sensei\'s True Face!')">ep 101</button>
+                    <button class="button" onclick="playVideo('uploads/naruto_ep102.mp4', 'Episode 102: Mission: Help an Old Friend in the Land of Tea')">ep 102</button>
+                    <button class="button" onclick="playVideo('uploads/naruto_ep103.mp4', 'Episode 103: The Race is On! Trouble on the High Seas!')">ep 103</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep104.mp4', 'Episode 104: Run Idate Run! Nagi Island Awaits!')">ep 104</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep105.mp4', 'Episode 105: A Fierce Battle of Rolling Thunder!')">ep 105</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep106.mp4', 'Episode 106: The Last Leg: A Final Act of Desperation')">ep 106</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep107.mp4', 'Episode 107: The Battle Begins: Naruto vs. Sasuke')">ep 107</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep108.mp4', 'Episode 108: Bitter Rivals and Broken Bonds')">ep 108</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep109.mp4', 'Episode 109: An Invitation from the Sound')">ep 109</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep110.mp4', 'Episode 110: Formation! The Sasuke Retrieval Squad!')">ep 110</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep111.mp4', 'Episode 111: Sound vs. Leaf')">ep 111</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep112.mp4', 'Episode 112: Squad Mutiny: Everything Falls Apart!')">ep 112</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep113.mp4', 'Episode 113: Full Throttle Power! Choji, Ablaze!')">ep 113</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep114.mp4', 'Episode 114: Good-bye Old Friend...! I\'ll Always Believe in You!')">ep 114</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep115.mp4', 'Episode 115: Your Opponent is Me!')">ep 115</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep116.mp4', 'Episode 116: 360 Degrees of Vision: The Byakugan\'s Blind Spot!')">ep 116</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep117.mp4', 'Episode 117: Losing is Not an Option!')">ep 117</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep118.mp4', 'Episode 118: The Vessel Arrives Too Late')">ep 118</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep119.mp4', 'Episode 119: Miscalculation: A New Enemy Appears!')">ep 119</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep120.mp4', 'Episode 120: Roar and Howl! The Ultimate Tag Team!')">ep 120</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep121.mp4', 'Episode 121: To Each His Own Battle')">ep 121</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep122.mp4', 'Episode 122: Fakeout: Shikamaru\'s Comeback!')">ep 122</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep123.mp4', 'Episode 123: The Leaf\'s Handsome Devil!')">ep 123</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep124.mp4', 'Episode 124: The Beast Within')">ep 124</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep125.mp4', 'Episode 125: The Sand Shinobi: Allies of the Leaf')">ep 125</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep126.mp4', 'Episode 126: Showdown in the Forest of Death')">ep 126</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep127.mp4', 'Episode 127: The Battle at Sea: The Power Unleashed!')">ep 127</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep128.mp4', 'Episode 128: A Cry on Deaf Ears')">ep 128</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep129.mp4', 'Episode 129: Brothers: Distance Among the Uchihas')">ep 129</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep130.mp4', 'Episode 130: Father and Son, the Broken Crest')">ep 130</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep131.mp4', 'Episode 131: The Secrets of the Mangekyo Sharingan!')">ep 131</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep132.mp4', 'Episode 132: For a Friend')">ep 132</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep133.mp4', 'Episode 133: A Plea from a Friend')">ep 133</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep134.mp4', 'Episode 134: The End of Tears')">ep 134</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep135.mp4', 'Episode 135: The Promise That Could Not Be Kept')">ep 135</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep136.mp4', 'Episode 136: Deep Cover?! A Super S-Ranked Mission')">ep 136</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep137.mp4', 'Episode 137: A Town of Outlaws, the Shadow of the Fuma Clan')">ep 137</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep138.mp4', 'Episode 138: Pure Betrayal, and a Fleeting Plea!')">ep 138</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep139.mp4', 'Episode 139: Pure Terror! The House of Orochimaru')">ep 139</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep140.mp4', 'Episode 140: Two Heartbeats: Kabuto\'s Trap')">ep 140</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep141.mp4', 'Episode 141: Sakura\'s Determination')">ep 141</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep142.mp4', 'Episode 142: The Three Villains from the Maximum Security Prison')">ep 142</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep143.mp4', 'Episode 143: Tonton! I\'m Counting on You!')">ep 143</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep144.mp4', 'Episode 144: A New Squad! Two People and a Dog?!')">ep 144</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep145.mp4', 'Episode 145: A New Formation: Ino-Shika-Cho!')">ep 145</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep146.mp4', 'Episode 146: Orochimaru\'s Shadow')">ep 146</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep147.mp4', 'Episode 147: A Clash of Fate: You Can\'t Bring Me Down!')">ep 147</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep148.mp4', 'Episode 148: The Search for the Rare Bikochu Beetle')">ep 148</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep149.mp4', 'Episode 149: What\'s the Difference? Don\'t All Insects Look the Same?')">ep 149</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep150.mp4', 'Episode 150: A Battle of the Bugs! The Deceivers and the Deceived')">ep 150</button>
+        <button class="button" onclick="playVideo('uploads/naruto_ep151.mp4', 'Episode 151: Blaze Away Byakugan! This is My Ninja Way!')">ep 151</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep152.mp4', 'Episode 152: Funeral March for the Living')">ep 152</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep153.mp4', 'Episode 153: A Lesson Learned! The Iron Fist of Love!')">ep 153</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep154.mp4', 'Episode 154: The Enemy of the Byakugan')">ep 154</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep155.mp4', 'Episode 155: The Dark Cloud Over the Leaf Village!')">ep 155</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep156.mp4', 'Episode 156: Raiga\'s Counterattack')">ep 156</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep157.mp4', 'Episode 157: Run! The Curry of Life!')">ep 157</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep158.mp4', 'Episode 158: Follow My Lead! The Great Survival Challenge')">ep 158</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep159.mp4', 'Episode 159: Gutsy Ninja! Please Help Hayate!')">ep 159</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep160.mp4', 'Episode 160: Hidden Jutsu! The Price of The Ninja Art: Kujaku')">ep 160</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep161.mp4', 'Episode 161: The Appearance of Strange Visitors')">ep 161</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep162.mp4', 'Episode 162: The Cursed Warrior')">ep 162</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep163.mp4', 'Episode 163: The Tactician\'s Intent')">ep 163</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep164.mp4', 'Episode 164: The Death of Naruto')">ep 164</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep165.mp4', 'Episode 165: The Death of Naruto')">ep 165</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep166.mp4', 'Episode 166: When Time Stands Still')">ep 166</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep167.mp4', 'Episode 167: When Egrets Flap Their Wings')">ep 167</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep168.mp4', 'Episode 168: Mix It, Stretch It, Boil It Up! Burn, Copper Pot, Burn!')">ep 168</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep169.mp4', 'Episode 169: Remembrance: The Lost Page')">ep 169</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep170.mp4', 'Episode 170: The Closed Door')">ep 170</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep171.mp4', 'Episode 171: Infiltration: The Set-Up!')">ep 171</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep172.mp4', 'Episode 172: Despair: A Fractured Heart')">ep 172</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep173.mp4', 'Episode 173: The Battle at Sea: The Power Unleashed!')">ep 173</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep174.mp4', 'Episode 174: Impossible! Celebrity Ninja Art: Money Style Jutsu!')">ep 174</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep175.mp4', 'Episode 175: The Treasure Hunt is On!')">ep 175</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep176.mp4', 'Episode 176: Run, Dodge, Zigzag! Chase or Be Chased!')">ep 176</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep177.mp4', 'Episode 177: Please, Mr. Postman!')">ep 177</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep178.mp4', 'Episode 178: Encounter! The Boy with a Star\'s Name')">ep 178</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep179.mp4', 'Episode 179: The Remembered Lullaby')">ep 179</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep180.mp4', 'Episode 180: Hidden Star: A Reunion with Destiny')">ep 180</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep181.mp4', 'Episode 181: Hoshikage: The Buried Truth')">ep 181</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep182.mp4', 'Episode 182: Reunion: The Remaining Time')">ep 182</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep183.mp4', 'Episode 183: The Star\'s Radiance')">ep 183</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep184.mp4', 'Episode 184: Kiba\'s Long Day')">ep 184</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep185.mp4', 'Episode 185: A Legend from the Hidden Leaf: The Onbaa!')">ep 185</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep186.mp4', 'Episode 186: Laughing Shino')">ep 186</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep187.mp4', 'Episode 187: Ino Screams! Chubby Paradise!')">ep 187</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep188.mp4', 'Episode 188: The Yamanaka Clan: Secret Flower Garden!')">ep 188</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep189.mp4', 'Episode 189: A Limitless Supply of Ninja Tools')">ep 189</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep190.mp4', 'Episode 190: The Byakugan Sees the Blind Spot!')">ep 190</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep191.mp4', 'Episode 191: Forecast: Death! Cloudy with Chance of Sun!')">ep 191</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep192.mp4', 'Episode 192: Ino and Naruto: The Forced Mission!')">ep 192</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep193.mp4', 'Episode 193: Viva Dojo Challenge! Youth is All About Passion!')">ep 193</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep194.mp4', 'Episode 194: The Mysterious Curse of the Haunted Castle')">ep 194</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep195.mp4', 'Episode 195: The Third Super-Beast!')">ep 195</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep196.mp4', 'Episode 196: Hot-Blooded Confrontation: Student vs. Sensei')">ep 196</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep197.mp4', 'Episode 197: Crisis: The Hidden Leaf 11 Unite!')">ep 197</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep198.mp4', 'Episode 198: The ANBU Gives Up? Naruto\'s Recollection')">ep 198</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep199.mp4', 'Episode 199: The Missed Target')">ep 199</button>
+                    <!-- ...repeat for all episodes up to ep 200... -->
+                    <button class="button" onclick="playVideo('uploads/naruto_ep200.mp4', 'Episode 200: The Powerful Helper')">ep 200</button>
+                </div>
+                <div id="episodes-201-220" class="episode-group">
+                    <!-- Episodes 201-220 -->
+                    <button class="button" onclick="playVideo('uploads/naruto_ep201.mp4', 'Episode 201: Multiple Traps! Countdown to Destruction')">ep 201</button>
+                <button class="button" onclick="playVideo('uploads/naruto_ep202.mp4', 'Episode 202: The Top 5 Ninja Battles')">ep 202</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep203.mp4', 'Episode 203: Kurenai\'s Decision: Squad 8 Left Behind')">ep 203</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep204.mp4', 'Episode 204: Yakumo\'s Sealed Power')">ep 204</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep205.mp4', 'Episode 205: Kurenai\'s Top-Secret Mission: The Promise with the Third Hokage')">ep 205</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep206.mp4', 'Episode 206: Genjutsu or Reality?')">ep 206</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep207.mp4', 'Episode 207: The Supposed Sealed Ability')">ep 207</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep208.mp4', 'Episode 208: The Weight of the Prized Artifact!')">ep 208</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep209.mp4', 'Episode 209: The Enemy: Ninja Dropouts')">ep 209</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep210.mp4', 'Episode 210: The Bewildering Forest')">ep 210</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep211.mp4', 'Episode 211: Memory of Flames')">ep 211</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep212.mp4', 'Episode 212: To Each His Own Path')">ep 212</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep213.mp4', 'Episode 213: Vanished Memories')">ep 213</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep214.mp4', 'Episode 214: Bringing Back Reality')">ep 214</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep215.mp4', 'Episode 215: A Past to Be Erased')">ep 215</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep216.mp4', 'Episode 216: The Targeted Shukaku')">ep 216</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep217.mp4', 'Episode 217: Sand Alliance With the Leaf Shinobi')">ep 217</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep218.mp4', 'Episode 218: The Counterattack!')">ep 218</button>
+    <button class="button" onclick="playVideo('uploads/naruto_ep219.mp4', 'Episode 219: The Ultimate Weapon Reborn')">ep 219</button>
+                    <!-- ...repeat for all episodes up to ep 220... -->
+                    <button class="button" onclick="playVideo('uploads/naruto_ep220.mp4', 'Episode 220: Departure')">ep 220</button>
+                </div>
+            </div>
+            
+            <!-- Comments Section -->
+            <section class="comments-section">
+                <h2 style="color: #4cc9f0; margin-top: 40px; font-size: 1.8rem;">Comments</h2>
+                <div class="comments-container">
+                    <div class="comment-form">
+                        <textarea id="comment-text" placeholder="Share your thoughts about this anime..." style="width: 100%; height: 100px; padding: 12px; border-radius: 8px; border: 1px solid #4cc9f0; background: #232531; color: #fff; font-family: 'Segoe UI', Arial; resize: vertical;"></textarea>
+                        <button onclick="addComment()" style="background: #4cc9f0; color: #fff; border: none; padding: 10px 20px; margin-top: 10px; border-radius: 8px; cursor: pointer; font-weight: 600;">Post Comment</button>
+                    </div>
+                    <div id="comments-list" style="margin-top: 20px;">
+                        <!-- Comments will appear here -->
+                    </div>
+                </div>
+            </section>
+            
+            <div style="text-align: center; margin: 40px 0;">
+                <button onclick="document.getElementById('recommend-section').scrollIntoView({ behavior: 'smooth' })" style="background: #4cc9f0; color: #fff; border: none; padding: 12px 28px; font-size: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s;">
+                    <i class="fas fa-heart"></i> View Recommended Anime
+                </button>
+            </div>
+            
+            <div class="recommend-section" id="recommend-section">
+                <div class="recommend-title">Recommended Anime</div>
+                <div class="recommend-list">
+                    <div class="anime-card">
+                        <a href="aot.html"><img src="aot.jpg" alt="Attack on Titan"></a>
+                        <h3>Attack on Titan</h3>
+                        <p>Humanity fights for survival against giant Titans.</p>
+                    </div>
+                    <div class="anime-card">
+                        <a href="onepiece.html"><img src="download.jpg" alt="One Piece"></a>
+                        <h3>One Piece</h3>
+                        <p>Pirates search for the legendary treasure.</p>
+                    </div>
+                    <div class="anime-card">
+                        <a href="bleach.html"><img src="bleach.jpg" alt="Bleach"></a>
+                        <h3>Bleach</h3>
+                        <p>Ichigo battles evil spirits as a Soul Reaper.</p>
+                    </div>
+                    <div class="anime-card">
+                        <a href="danmachi.html"><img src="danmachi.jpg" alt="Danmachi"></a>
+                        <h3>Danmachi</h3>
+                        <p>Adventures in the dungeon city of Orario.</p>
+                    </div>
+                    <div class="anime-card">
+    <a href="boruto.html"><img src="boruto.jpg" alt="Boruto"></a>
+    <h3>Boruto: Naruto Next Generations</h3>
+    <p>The next generation of shinobi fights to protect Hidden Leaf Village.</p>
+</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div>
+
+            Owned and operated by koushik vardhan | 
+            <a href="tel:9390956911" style="color:#4cc9f0;">9390956911</a> | 
+            <a href="mailto:koushikvardhan2006@gmail.com" style="color:#4cc9f0;">koushikvardhan2006@gmail.com</a> | 
+            <span>andhra pradesh, india - 533005</span>
+        </div>
+    </footer>
+    <script>
+        function jumpToEpisode() {
+    var ep = parseInt(document.getElementById('ep-jump').value, 10);
+    if(isNaN(ep) || ep < 1 || ep > 220) {
+        alert('Enter a valid episode number (1â€“220).');
+        return;
+    }
+    // Determine batch
+    var batch = "";
+    if(ep >= 1 && ep <= 100) batch = "1-100";
+    else if(ep >= 101 && ep <= 200) batch = "101-200";
+    else batch = "201-220";
+
+    // Switch batch (activate tab & show group)
+    document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
+    var btn = document.querySelector('.range-btn[data-range="'+batch+'"]');
+    if(btn) btn.classList.add('active');
+    document.querySelectorAll('.episode-group').forEach(g=>g.classList.remove('active'));
+    var eg = document.getElementById('episodes-'+batch);
+    if(eg) eg.classList.add('active');
+
+    // AUTOMATICALLY CLICK the right episode button if it exists!
+    setTimeout(function(){
+        var idx = (batch === "1-100") ? ep-1 : (batch === "101-200" ? ep-101 : ep-201);
+        var btns = eg ? eg.querySelectorAll('.button') : [];
+        if(btns[idx]) btns[idx].click();
+    },150);
+}
+document.getElementById('ep-jump').addEventListener('keydown', function(e) {
+  if(e.key === "Enter") {
+    e.preventDefault();        // prevents form submission or page reload
+    jumpToEpisode();
+  }
+});
+        // Navbar mobile toggle
+        const menuBars = document.getElementById('menu-bars');
+        const navbar = document.getElementById('navbar');
+        if (menuBars && navbar) {
+            menuBars.onclick = function(e) {
+                e.stopPropagation();
+                navbar.classList.toggle('show');
+            };
+            document.addEventListener('click', function(e) {
+                if (!navbar.contains(e.target) && !menuBars.contains(e.target)) {
+                    navbar.classList.remove('show');
+                }
+            });
+        }
+        // Search functionality
+        const searchIcon = document.getElementById('search-icons');
+        const searchBar = document.getElementById('search-bar');
+        if (searchIcon) {
+            searchIcon.onclick = function(e) {
+                e.stopPropagation();
+                searchBar.classList.toggle('active');
+                if (searchBar.classList.contains('active')) {
+                    document.getElementById('search-input').focus();
+                }
+            };
+        }
+        function searchAnime() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            if (!query) return;
+            const animeMap = {
+                'naruto': 'naruto.html',
+                'bleach': 'bleach.html',
+                'danmachi': 'danmachi.html',
+                'aot': 'aot.html',
+                'attack on titan': 'aot.html',
+                'onepiece': 'onepiece.html',
+                'one piece': 'onepiece.html',
+                'boruto': 'boruto.html',
+                'deathnote': 'deathnote.html',
+                'demon slayer': 'demonslayer.html',
+                'solo leveling': 'sololeveling.html',
+                'fairy tail': 'fairytail.html',
+                'one punchman': 'onepunchman.html',
+                'jojo': 'jojo.html',
+                'dragonball': 'dragonball.html',
+                'my hero academia': 'myheroacademia.html',
+                'hunter x hunter': 'hunterxhunter.html',
+                'black clover': 'blackclover.html'
+            };
+            if (animeMap[query]) {
+                window.location.href = animeMap[query];
+            } else {
+                alert('Anime not found. Try: naruto, bleach, danmachi, aot, or onepiece');
+            }
+        }
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchAnime();
+        });
+        document.addEventListener('click', function(e) {
+            if (!searchBar.contains(e.target) && e.target !== searchIcon) {
+                searchBar.classList.remove('active');
+                document.getElementById('search-suggestions').classList.remove('show');
+            }
+        });
+        // Autocomplete functionality with cards
+        const animeData = {
+            'naruto': { title: 'Naruto', img: 'naruto.jpg', url: 'naruto.html', alias: ['naruto'] },
+            'bleach': { title: 'Bleach', img: 'bleach.jpg', url: 'bleach.html', alias: ['bleach'] },
+            'danmachi': { title: 'Danmachi', img: 'danmachi.jpg', url: 'danmachi.html', alias: ['danmachi'] },
+            'aot': { title: 'Attack on Titan', img: 'aot.jpg', url: 'aot.html', alias: ['aot', 'attack on titan'] },
+            'onepiece': { title: 'One Piece', img: 'download.jpg', url: 'onepiece.html', alias: ['onepiece', 'one piece'] },
+            'boruto': { title: 'Boruto', img: 'boruto.jpg', url: 'boruto.html', alias: ['boruto'] }
+        };
+        
+        const searchInput = document.getElementById('search-input');
+        const suggestionsDiv = document.getElementById('search-suggestions');
+        
+        searchInput.addEventListener('input', function() {
+            const value = this.value.toLowerCase().trim();
+            suggestionsDiv.innerHTML = '';
+            
+            if (value.length === 0) {
+                suggestionsDiv.classList.remove('show');
+                return;
+            }
+            
+            // Filter anime by title or alias
+            const filtered = Object.entries(animeData).filter(([key, anime]) => 
+                anime.title.toLowerCase().includes(value) || 
+                anime.alias.some(alias => alias.startsWith(value))
+            );
+            
+            if (filtered.length === 0) {
+                suggestionsDiv.classList.remove('show');
+                return;
+            }
+            
+            suggestionsDiv.classList.add('show');
+            filtered.forEach(([key, anime]) => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `<img src="${anime.img}" alt="${anime.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22%3E%3Crect fill=%22%23333%22 width=%22120%22 height=%22120%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'"><div class="suggestion-title">${anime.title}</div>`;
+                item.onclick = function(e) {
+                    e.stopPropagation();
+                    window.location.href = anime.url;
+                };
+                suggestionsDiv.appendChild(item);
+            });
+        });
+        function playVideo(src, title) {
+            var videoPlayer = document.getElementById("videoPlayer");
+            videoPlayer.src = src;
+            videoPlayer.play();
+            document.getElementById('episode-title').textContent = title;
+        }
+        document.querySelectorAll('.range-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.episode-group').forEach(g => g.classList.remove('active'));
+            document.getElementById('episodes-' + this.dataset.range).classList.add('active');
+          });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+          document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.episode-group').forEach(g => g.classList.remove('active'));
+          document.querySelector('.range-btn[data-range="1-100"]').classList.add('active');
+          document.getElementById('episodes-1-100').classList.add('active');
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+
+    <script>
+    // Load comments from localStorage
+    function loadComments() {
+        const comments = JSON.parse(localStorage.getItem('naruto-comments')) || [];
+        const commentsList = document.getElementById('comments-list');
+        commentsList.innerHTML = '';
+        comments.forEach(comment => {
+            const commentDiv = document.createElement('div');
+            commentDiv.style.cssText = 'background: #232531; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #4cc9f0;';
+            commentDiv.innerHTML = `
+                <p style="margin: 0 0 8px 0; color: #4cc9f0; font-weight: bold;">${comment.date}</p>
+                <p style="margin: 0; color: #fff;">${comment.text}</p>
+            `;
+            commentsList.appendChild(commentDiv);
+        });
+    }
+
+    // Add new comment
+    function addComment() {
+        const text = document.getElementById('comment-text').value.trim();
+        if (!text) {
+            alert('Please write a comment!');
+            return;
+        }
+        const comments = JSON.parse(localStorage.getItem('naruto-comments')) || [];
+        const now = new Date().toLocaleString();
+        comments.unshift({ text, date: now });
+        localStorage.setItem('naruto-comments', JSON.stringify(comments));
+        document.getElementById('comment-text').value = '';
+        loadComments();
+    }
+
+    // Load comments on page load
+    window.addEventListener('DOMContentLoaded', loadComments);
+
+    (function() {
+        let lastScroll = 0;
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', function() {
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+            if (!header) return;
+            if (currentScroll > lastScroll && currentScroll > 60) {
+                header.classList.add('navbar-hidden');
+            } else {
+                header.classList.remove('navbar-hidden');
+            }
+            lastScroll = currentScroll;
+        }, { passive: true });
+    })();
+    </script>
+    <script>
+    // Add favorites heart to anime cards
+    (function(){
+      function loadFavorites(){
+        try{ return JSON.parse(localStorage.getItem('favorites')||'[]'); }catch(e){ return []; }
+      }
+      function saveFavorites(list){ localStorage.setItem('favorites', JSON.stringify(list||[])); }
+      function isFavorited(url){ const list = loadFavorites(); return !!list.find(f=>f.url === url); }
+      
+      document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('.anime-card').forEach(card=>{
+          if(card.querySelector('.card-fav')) return;
+          const link = card.querySelector('a[href]');
+          if(!link) return;
+          const url = link.getAttribute('href');
+          const h = card.querySelector('h3');
+          const title = h ? h.textContent.trim() : url;
+          
+          const btn = document.createElement('button');
+          btn.className = isFavorited(url) ? 'card-fav' : 'card-fav not-fav';
+          btn.innerHTML = '<i class="' + (isFavorited(url) ? 'fas' : 'far') + ' fa-heart"></i>';
+          btn.style.cssText = 'position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.5);border:none;padding:6px;border-radius:8px;cursor:pointer;z-index:50;';
+          
+          btn.addEventListener('click', function(e){
+            e.preventDefault(); 
+            e.stopPropagation();
+            const list = loadFavorites();
+            const idx = list.findIndex(f=>f.url===url);
+            if(idx>=0){
+              list.splice(idx, 1);
+              btn.classList.add('not-fav');
+              btn.innerHTML = '<i class="far fa-heart"></i>';
+            } else {
+              list.unshift({ title, url });
+              btn.classList.remove('not-fav');
+              btn.innerHTML = '<i class="fas fa-heart"></i>';
+            }
+            saveFavorites(list);
+          });
+          
+          card.style.position = 'relative';
+          card.insertBefore(btn, card.firstChild);
+        });
+      });
+    })();
+    
+    // Favorites button navigation
+    const favoritesBtn = document.getElementById('favorites-btn');
+    if (favoritesBtn) {
+      favoritesBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'favorites.html';
+      });
+    }
+
+    // User login/logout functionality
+    const userIcon = document.getElementById('user-icon');
+    const userMenu = document.getElementById('user-menu');
+    const userMenuContent = document.getElementById('user-menu-content');
+
+    function updateUserMenu() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser && currentUser.loggedIn) {
+            userMenuContent.innerHTML = `
+                <div class="user-menu-item" style="padding:10px;border-bottom:1px solid #4cc9f0;color:#4cc9f0;font-weight:600;">
+                    Welcome, ${currentUser.username}!
+                </div>
+                <button id="logoutBtn" style="width:100%;padding:10px;background:#ff7b9a;border:none;color:#fff;cursor:pointer;font-weight:600;border-radius:4px;">Logout</button>
+            `;
+            setTimeout(() => {
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', logout);
+                }
+            }, 0);
+        } else {
+            userMenuContent.innerHTML = `
+                <a href="login.html" style="display:block;padding:10px;color:#4cc9f0;text-decoration:none;text-align:center;border-bottom:1px solid #4cc9f0;font-weight:600;">Login</a>
+                <a href="sign up.html" style="display:block;padding:10px;color:#4cc9f0;text-decoration:none;text-align:center;font-weight:600;">Sign Up</a>
+            `;
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('rememberMe');
+        updateUserMenu();
+        userMenu.classList.remove('show');
+        window.location.href = window.location.href;
+    }
+
+    if (userIcon && userMenu) {
+        userIcon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userMenu.classList.toggle('show');
+            if (userMenu.classList.contains('show')) {
+                userMenu.setAttribute('aria-hidden', 'false');
+            } else {
+                userMenu.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!userMenu.contains(e.target) && e.target !== userIcon && !userIcon.contains(e.target)) {
+                userMenu.classList.remove('show');
+                userMenu.setAttribute('aria-hidden', 'true');
+            }
+        });
+    }
+
+    updateUserMenu();
+    </script>
+    <script src="favorites.js"></script>
+</body>
+</html>
+

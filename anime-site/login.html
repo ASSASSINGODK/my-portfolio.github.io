@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Anime Site</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-container {
+            background: rgba(28, 31, 38, 0.95);
+            border-radius: 15px;
+            padding: 45px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid #4cc9f0;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .login-header h1 {
+            color: #4cc9f0;
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #4cc9f0;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #232531;
+            border: 1px solid #4cc9f0;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #38b0d8;
+            box-shadow: 0 0 8px rgba(76, 201, 240, 0.3);
+        }
+
+        .form-group input::placeholder {
+            color: #888;
+        }
+
+        .password-toggle {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .password-toggle input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            background: #232531;
+            border: 1px solid #4cc9f0;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .password-toggle input:focus {
+            outline: none;
+            border-color: #38b0d8;
+            box-shadow: 0 0 8px rgba(76, 201, 240, 0.3);
+        }
+
+        .toggle-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #4cc9f0;
+            font-size: 1.2rem;
+            user-select: none;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+
+        .remember-forgot label {
+            display: flex;
+            align-items: center;
+            color: #aaa;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .remember-forgot input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .remember-forgot a {
+            color: #4cc9f0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .remember-forgot a:hover {
+            color: #ff7b9a;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #4cc9f0, #38b0d8);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #38b0d8, #2d98a8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(76, 201, 240, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.error {
+            background: rgba(255, 123, 154, 0.2);
+            color: #ff7b9a;
+            border: 1px solid #ff7b9a;
+        }
+
+        .message.success {
+            background: rgba(76, 201, 240, 0.2);
+            color: #4cc9f0;
+            border: 1px solid #4cc9f0;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+
+        .signup-link a {
+            color: #4cc9f0;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .signup-link a:hover {
+            color: #ff7b9a;
+        }
+
+        .forgot-password-section {
+            display: none;
+        }
+
+        .forgot-password-section.show {
+            display: block;
+        }
+
+        .back-button {
+            background: #666;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .back-button:hover {
+            background: #555;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            .login-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <button class="back-button" id="backBtn" style="display:none;" onclick="hideForgotPassword()">← Back to Login</button>
+
+        <div class="login-header">
+            <h1><i class="fas fa-infinity"></i> Anime</h1>
+            <p id="headerText">Login to your account</p>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">Username or Email</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    placeholder="Enter your username or email" 
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+            </div>
+            <div class="password-toggle">
+                <input 
+                    type="password" 
+                    id="password" 
+                    placeholder="Enter your password" 
+                    required
+                >
+                <span class="toggle-icon" onclick="togglePasswordVisibility('password')"><i class="fas fa-eye"></i></span>
+            </div>
+
+            <div class="remember-forgot">
+                <label>
+                    <input type="checkbox" id="remember">
+                    Remember me
+                </label>
+                <a href="#" onclick="showForgotPassword(); return false;">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+
+            <div id="message" class="message"></div>
+        </form>
+
+        <form id="forgotPasswordForm" class="forgot-password-section" onsubmit="handleForgotPassword(event)">
+            <div class="form-group">
+                <label for="resetEmail">Email or Username</label>
+                <input 
+                    type="text" 
+                    id="resetEmail" 
+                    placeholder="Enter your email or username" 
+                    required
+                >
+            </div>
+
+            <button type="submit" class="login-btn">
+                <i class="fas fa-envelope"></i> Send Reset Link
+            </button>
+
+            <div id="forgotMessage" class="message"></div>
+        </form>
+
+        <div class="signup-link">
+            Don't have an account? <a href="sign up.html">Sign up here</a>
+        </div>
+    </div>
+
+    <script>
+        // Initialize demo account
+        function initializeDemoAccount() {
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+            if (!users['demo']) {
+                users['demo'] = {
+                    password: 'password',
+                    email: 'demo@anime.com'
+                };
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+        }
+
+        // Check if user is already logged in
+        function checkAlreadyLoggedIn() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser && currentUser.loggedIn) {
+                window.location.href = 'Assassingodk.html';
+            }
+        }
+
+        // Handle login form submission
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value.toLowerCase().trim();
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+            
+            if (!username || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+            
+            if (users[username] && users[username].password === password) {
+                // Login successful
+                const userData = {
+                    username: username,
+                    email: users[username].email || '',
+                    loggedIn: true,
+                    loginTime: new Date().getTime()
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                
+                if (document.getElementById('remember').checked) {
+                    localStorage.setItem('rememberMe', 'true');
+                }
+                
+                showMessage('Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'Assassingodk.html';
+                }, 1000);
+            } else {
+                showMessage('Invalid username or password', 'error');
+                document.getElementById('password').value = '';
+            }
+        }
+
+        function showMessage(msg, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = msg;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+        }
+
+        // Toggle password visibility
+        function togglePasswordVisibility(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = event.target.closest('.toggle-icon').querySelector('i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDemoAccount();
+            checkAlreadyLoggedIn();
+        });
+
+        // Show forgot password form
+        function showForgotPassword() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('forgotPasswordForm').classList.add('show');
+            document.getElementById('backBtn').style.display = 'block';
+            document.getElementById('headerText').textContent = 'Reset your password';
+        }
+
+        // Hide forgot password form
+        function hideForgotPassword() {
+            document.getElementById('forgotPasswordForm').classList.remove('show');
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('backBtn').style.display = 'none';
+            document.getElementById('headerText').textContent = 'Login to your account';
+            document.getElementById('forgotPasswordForm').reset();
+            document.getElementById('forgotMessage').style.display = 'none';
+        }
+
+        // Handle forgot password
+        function handleForgotPassword(event) {
+            event.preventDefault();
+            
+            const emailOrUsername = document.getElementById('resetEmail').value.toLowerCase().trim();
+            const forgotMessage = document.getElementById('forgotMessage');
+            
+            if (!emailOrUsername) {
+                showForgotMessage('Please enter your email or username', 'error');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+            let userFound = false;
+            let userEmail = '';
+
+            // Search for user by username or email
+            for (let username in users) {
+                if (username === emailOrUsername || users[username].email === emailOrUsername) {
+                    userFound = true;
+                    userEmail = users[username].email;
+                    break;
+                }
+            }
+
+            if (userFound) {
+                // In a real app, you'd send an email here
+                // For now, we'll show a demo reset code
+                const resetCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                localStorage.setItem('resetCode_' + emailOrUsername, resetCode);
+                localStorage.setItem('resetEmail_' + emailOrUsername, userEmail || emailOrUsername);
+                
+                const messageDiv = document.getElementById('forgotMessage');
+                messageDiv.innerHTML = `
+                    <div style="background: #06d6a0; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <strong style="color: #fff;">✅ Reset code generated!</strong><br><br>
+                        <strong style="font-size: 1.3rem; color: #fff;">Code: ${resetCode}</strong><br><br>
+                        <button type="button" onclick="copyResetCode('${resetCode}')" style="background: #fff; color: #06d6a0; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; margin-top: 10px;">
+                            📋 Copy Code
+                        </button>
+                    </div>
+                    <strong>Simulated Email Sent To: ${userEmail || emailOrUsername}</strong><br>
+                    <span style="font-size: 0.9rem; color: #aaa;">
+                        In a real app, an email with this code would be sent to your inbox. For demo purposes, the code is shown above.
+                    </span>
+                `;
+                messageDiv.className = 'message success';
+                messageDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    // Show password reset form
+                    document.getElementById('forgotPasswordForm').innerHTML = `
+                        <div class="form-group">
+                            <label for="resetCode">Reset Code</label>
+                            <input type="text" id="resetCode" placeholder="Enter the code shown above or paste it here" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" id="newPassword" placeholder="Create a new password (min 6 chars)" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmNewPassword">Confirm Password</label>
+                            <input type="password" id="confirmNewPassword" placeholder="Confirm your new password" required>
+                        </div>
+                        <button type="button" class="login-btn" onclick="completePasswordReset('${emailOrUsername}')">
+                            <i class="fas fa-check"></i> Reset Password
+                        </button>
+                        <div id="forgotMessage" class="message"></div>
+                    `;
+                }, 2000);
+            } else {
+                showForgotMessage('No account found with that email or username', 'error');
+            }
+        }
+
+        // Complete password reset
+        function completePasswordReset(emailOrUsername) {
+            const resetCode = document.getElementById('resetCode').value.trim();
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+            
+            if (!resetCode || !newPassword || !confirmNewPassword) {
+                showForgotMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            const savedCode = localStorage.getItem('resetCode_' + emailOrUsername);
+            
+            if (resetCode !== savedCode) {
+                showForgotMessage('Invalid reset code', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showForgotMessage('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmNewPassword) {
+                showForgotMessage('Passwords do not match', 'error');
+                return;
+            }
+
+            // Update password in localStorage
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+            for (let username in users) {
+                if (username === emailOrUsername || users[username].email === emailOrUsername) {
+                    users[username].password = newPassword;
+                    break;
+                }
+            }
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.removeItem('resetCode_' + emailOrUsername);
+            
+            showForgotMessage('Password reset successfully! Redirecting to login...', 'success');
+            
+            setTimeout(() => {
+                hideForgotPassword();
+                document.getElementById('loginForm').reset();
+                document.getElementById('forgotPasswordForm').classList.remove('show');
+            }, 1500);
+        }
+
+        function showForgotMessage(msg, type) {
+            const messageDiv = document.getElementById('forgotMessage');
+            messageDiv.textContent = msg;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+        }
+
+        // Copy reset code to clipboard
+        function copyResetCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Reset code copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = code;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ Reset code copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>

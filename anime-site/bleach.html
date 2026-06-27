@@ -1,0 +1,864 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bleach</title>
+    <link rel="stylesheet" href="Assassingodk1.css">
+    <style>
+        /* Use the same CSS block from Naruto.html here for perfect match */
+        html, body {background:#181a20;color:#fff;font-family:'Segoe UI',Arial,sans-serif;margin:0;padding:0;height:100%;width:100%;}
+        header {width:100%;padding:20px 40px;background:#1c1f26;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+        .logo {color:#4cc9f0;font-size:2rem;text-decoration:none;font-weight:bold;display:flex;align-items:center;}
+        .logo i {margin-right:8px;}
+        .navbar {display:none;flex-direction:column;gap:20px;background:#232531;position:absolute;top:70px;right:40px;border-radius:10px;padding:20px;min-width:150px;box-shadow:0 4px 12px rgba(0,0,0,0.22);z-index:2000;}
+        .navbar.show {display:flex;}
+        .navbar a {color:#fff;text-decoration:none;font-size:1.1rem;font-weight:500;padding:8px 12px;border-radius:4px;transition:background 0.2s;}
+        .navbar a.active, .navbar a:hover {background:#4cc9f0;color:#fff;}
+        .icons {display:flex;align-items:center;gap:18px;font-size:1.5rem;color:#fff;}
+        .search-bar {display:none;flex-direction:column;gap:0;background:#232531;padding:8px 12px;border-radius:8px;border:1px solid #4cc9f0;position:absolute;top:70px;right:40px;z-index:1999;width:200px;}
+        .search-bar.active {display:flex !important;}
+        .search-input-wrapper {display:flex;align-items:center;gap:8px;}
+        .search-bar input {background:transparent;border:none;color:#fff;outline:none;flex:1;font-size:1rem;}
+        .search-bar input::placeholder {color:#999;}
+        .search-bar button {background:#4cc9f0;border:none;color:#fff;padding:6px 12px;border-radius:4px;cursor:pointer;font-weight:600;}
+        .search-bar button:hover {background:#38b0d8;}
+        .search-suggestions {display:none;max-height:200px;overflow-y:auto;border-top:1px solid #4cc9f0;margin-top:8px;}
+        .search-suggestions.show {display:block;}
+        .suggestion-item {padding:8px 12px;color:#fff;cursor:pointer;border-bottom:1px solid #333;}
+        .suggestion-item:hover {background:#4cc9f0;color:#000;}
+        .search-icon {cursor:pointer;}
+        .menu-icon {font-size:2rem;cursor:pointer;color:#4cc9f0;}
+        main {width:100vw;min-height:100vh;box-sizing:border-box;padding-top:110px;}
+        .main-content {width:100%;max-width:1200px;margin:0 auto;padding:0 40px 40px 40px;display:flex;flex-direction:column;}
+        h1 {color:#4cc9f0;margin-bottom:28px;font-size:2.7rem;font-weight:900;letter-spacing:2px;text-shadow:2px 2px 0 #000, 0 2px 12px #4cc9f088;}
+        .video-center {display:flex;justify-content:center;width:100%;margin-bottom:32px;}
+        video {width:100%;max-width:650px;height:auto;object-fit:contain;border-radius:10px;background:#000;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+        #episode-title {margin:16px 0 18px 0;font-size:1.3rem;color:#4cc9f0;font-weight:bold;min-height:24px;text-align:center;text-shadow:1px 1px 0 #000, 0 2px 8px #4cc9f088;}
+        .desc-image-row {display:flex;flex-direction:row;gap:32px;width:100%;align-items:flex-start;margin-bottom:30px;}
+        .image-left {flex:0 0 220px;display:flex;justify-content:flex-start;align-items:flex-start;}
+        .image-left img {width:180px;height:260px;object-fit:cover;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.16);display:block;}
+        .description {flex:1;color:#ececec;font-size:1.13rem;max-width:700px;text-align:left;align-self:stretch;display:flex;align-items:center;}
+        .button-section {display:flex;flex-direction:column;gap:10px;margin-bottom:28px;margin-top:8px;}
+        .episode-range-buttons {display:flex;gap:10px;margin-bottom:18px;justify-content:center;}
+        .range-btn {background:#4cc9f0;color:#fff;border:none;padding:10px 22px;font-size:1rem;border-radius:8px;font-weight:600;cursor:pointer;transition:background 0.18s, color 0.18s, transform 0.15s;outline:none;box-shadow:0 2px 8px #0002;}
+        .range-btn.active, .range-btn:hover {background:#38b0d8;color:#fff;transform:translateY(-2px) scale(1.06);box-shadow:0 2px 8px #4cc9f088;}
+        .episode-group {display:none;flex-wrap:nowrap;gap:10px;margin-top:10px;overflow-x:auto;max-width:100%;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:#4cc9f0 #232531;}
+        .episode-group::-webkit-scrollbar {height:8px;}
+        .episode-group::-webkit-scrollbar-thumb {background:#4cc9f0;border-radius:5px;}
+        .episode-group::-webkit-scrollbar-track {background:#232531;border-radius:5px;}
+        .episode-group.active {display:flex;}
+        .button {background-color:#4cc9f0;border:none;color:white;padding:10px 20px;font-size:16px;border-radius:6px;transition:background 0.2s, transform 0.15s;cursor:pointer;font-weight:500;box-shadow:0 2px 6px rgba(0,0,0,0.12);}
+        .button:hover {background-color:#38b0d8;transform:translateY(-2px) scale(1.04);}
+        .button:active {background-color:#2d98a8;transform:scale(0.98);}
+        .recommend-section {margin-top:32px;}
+        .recommend-title {color:#4cc9f0;font-size:1.5rem;font-weight:bold;margin-bottom:18px;}
+        .recommend-list {display:flex;flex-wrap:wrap;gap:26px;width:100%;justify-content:flex-start;}
+        .anime-card {background:rgba(24,24,24,0.8);border-radius:12px;padding:18px 16px;width:185px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,0.16);transition:transform 0.18s;}
+        .anime-card:hover {transform:translateY(-4px) scale(1.03);}
+        .anime-card img {width:130px;height:180px;object-fit:cover;border-radius:10px;}
+        .anime-card h3 {color:#4cc9f0;font-size:1.05rem;margin:10px 0 6px 0;}
+        .anime-card p {color:#ddd;font-size:0.97rem;margin:0;}
+        @media (max-width:900px) {.main-content{max-width:98vw;padding:0 4vw 24px 4vw;}.video-center video, .image-left img{max-width:96vw;}.desc-image-row{gap:16px;}.anime-card{width:42vw;min-width:160px;}}
+        @media (max-width:700px) {.desc-image-row{flex-direction:column;align-items:stretch;gap:20px;}.image-left{justify-content:center;}.description{max-width:100%;font-size:1rem;}.anime-card{width:90vw;min-width:72vw;}}
+        @media (max-width:600px) {header{padding:10px 7px;}.main-content{padding:0 2vw 10px 2vw;}h1{font-size:1.5rem;}.image-left img{max-width:90vw;height:200px;}.recommend-list{flex-direction:column;gap:18px;}.anime-card{width:100%;min-width:0;}}
+    </style>
+</head>
+<body>
+    <header>
+        <a href="Assassingodk.html" class="logo"><i class="fas fa-infinity"></i>Anime.</a>
+        <nav class="navbar" id="navbar">
+            <a href="Assassingodk.html">home</a>
+            <a href="page2.html" class="active">anime</a>
+            <a href="#action">action</a>
+            <a href="#manga">manga</a>
+            <a href="#movies">movies</a>
+        </nav>
+        <div class="icons">
+            <span class="menu-icon" id="menu-bars">&#9776;</span>
+            <span class="search-icon" id="search-icons" style="cursor: pointer;"><i class="fas fa-search"></i></span>
+            <span id="favorites-btn" role="button" aria-label="Favorites" style="cursor: pointer; position:relative; z-index:110;"><i id="favorites-icon" class="far fa-heart"></i></span>
+            <span id="user-icon" role="button" aria-label="User account" style="cursor: pointer; position:relative; z-index:110;"><i class="fas fa-user-circle"></i></span>
+        </div>
+        <div id="user-menu" class="user-menu" aria-hidden="true">
+            <div id="user-menu-content"></div>
+        </div>
+        <div class="search-bar" id="search-bar">
+            <div class="search-input-wrapper">
+                <input type="text" id="search-input" placeholder="Search anime...">
+                <button onclick="searchAnime()">Go</button>
+            </div>
+            <div class="search-suggestions" id="search-suggestions"></div>
+        </div>
+    </header>
+    <main>
+        <div class="main-content">
+            <h1>Bleach</h1>
+            <div class="video-center">
+                <video id="videoPlayer" controls>
+                    <source src="" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div id="episode-title"></div>
+            <div class="desc-image-row">
+                <div class="image-left">
+                    <img src="bleach.jpg" alt="Bleach">
+                </div>
+                <div class="description">
+                    Ichigo Kurosaki becomes a Soul Reaper and battles evil spirits to protect the living and the dead.
+                </div>
+            </div>
+            <div class="button-section">
+                <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:12px;">
+                    <label for="ep-jump" style="color:#eee;">Jump to episode:</label>
+                    <input id="ep-jump" type="number" min="1" max="330" style="width:74px;padding:6px 3px;border-radius:6px;border:none;outline:none;font-size:1rem;background:#232531;color:#fff;">
+                    <button onclick="jumpToEpisode()" style="background:#4cc9f0;color:white;padding:8px 14px;border:none;border-radius:6px;font-weight:600;cursor:pointer;">Go</button>
+                </div>
+                <div class="episode-range-buttons">
+                    <button class="range-btn active" data-range="season-1">Season 1</button>
+                    <button class="range-btn" data-range="season-2">Season 2</button>
+                    <button class="range-btn" data-range="season-3">Season 3</button>
+                    <button class="range-btn" data-range="season-4">Season 4</button>
+                    <button class="range-btn" data-range="season-5">Season 5</button>
+                </div>
+                <div id="episodes-season-1" class="episode-group active">
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_001_BD_1080p_Judas.mp4', 'Episode 1')">ep 1</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_002_BD_1080p_Judas.mp4', 'Episode 2')">ep 2</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_003_BD_1080p_Judas.mp4', 'Episode 3')">ep 3</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_004_BD_1080p_Judas.mp4', 'Episode 4')">ep 4</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_005_BD_1080p_Judas.mp4', 'Episode 5')">ep 5</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_006_BD_1080p_Judas.mp4', 'Episode 6')">ep 6</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_007_BD_1080p_Judas.mp4', 'Episode 7')">ep 7</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_008_BD_1080p_Judas.mp4', 'Episode 8')">ep 8</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_009_BD_1080p_Judas.mp4', 'Episode 9')">ep 9</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_010_BD_1080p_Judas.mp4', 'Episode 10')">ep 10</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_012_BD_1080p_Judas.mp4', 'Episode 12')">ep 12</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_013_BD_1080p_Judas.mp4', 'Episode 13')">ep 13</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_014_BD_1080p_Judas.mp4', 'Episode 14')">ep 14</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_015_BD_720p_Judas.mp4', 'Episode 15')">ep 15</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_016_BD_1080p_Judas.mp4', 'Episode 16')">ep 16</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_017_BD_1080p_Judas.mp4', 'Episode 17')">ep 17</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_018_BD_1080p_Judas.mp4', 'Episode 18')">ep 18</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_019_BD_1080p_Judas.mp4', 'Episode 19')">ep 19</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_020_BD_1080p_Judas.mp4', 'Episode 20')">ep 20</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_021_BD_1080p_Judas.mp4', 'Episode 21')">ep 21</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_022_BD_1080p_Judas.mp4', 'Episode 22')">ep 22</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_023_BD_1080p_Judas.mp4', 'Episode 23')">ep 23</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_024_BD_1080p_Judas.mp4', 'Episode 24')">ep 24</button>
+                    <button class="button" onclick="playVideo('bleach videos/AnimePahe_Bleach_-_025_BD_1080p_Judas.mp4', 'Episode 25')">ep 25</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep26.mp4', 'Episode 26: Soul Society Investigation')">ep 26</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep27.mp4', 'Episode 27: Ichigo Joins the Soul Society')">ep 27</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep28.mp4', 'Episode 28: Memories from the Past')">ep 28</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep29.mp4', 'Episode 29: The Enemy\'s True Power')">ep 29</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep30.mp4', 'Episode 30: Battle in the Hidden Town')">ep 30</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep31.mp4', 'Episode 31: Aizen\'s Betrayal')">ep 31</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep32.mp4', 'Episode 32: The Final Battle Begins')">ep 32</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep33.mp4', 'Episode 33: Ichigo\'s New Power')">ep 33</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep34.mp4', 'Episode 34: Aizen vs. Ichigo')">ep 34</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep35.mp4', 'Episode 35: The Destiny')">ep 35</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep36.mp4', 'Episode 36: Soul Society Arc Conclusion')">ep 36</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep37.mp4', 'Episode 37: After the Battle')">ep 37</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep38.mp4', 'Episode 38: The Hollowification Begins')">ep 38</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep39.mp4', 'Episode 39: New Enemies Arrive')">ep 39</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep40.mp4', 'Episode 40: The Arrancar Invasion')">ep 40</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep41.mp4', 'Episode 41: Hueco Mundo Beckons')">ep 41</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep42.mp4', 'Episode 42: Orihime\'s Abduction')">ep 42</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep43.mp4', 'Episode 43: Ichigo\'s Rescue Mission')">ep 43</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep44.mp4', 'Episode 44: The Depths of Despair')">ep 44</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep45.mp4', 'Episode 45: The Encounter with Ulquiorra')">ep 45</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep46.mp4', 'Episode 46: Breaking the Chains')">ep 46</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep47.mp4', 'Episode 47: The Bond of Friendship')">ep 47</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep48.mp4', 'Episode 48: Deicide Part 1')">ep 48</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep49.mp4', 'Episode 49: Deicide Part 2')">ep 49</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep50.mp4', 'Episode 50: Deicide Part 3')">ep 50</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep51.mp4', 'Episode 51: The Thousand-Year-Old Enemy')">ep 51</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep52.mp4', 'Episode 52: Yhwach Appears')">ep 52</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep53.mp4', 'Episode 53: The Invasion Begins')">ep 53</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep54.mp4', 'Episode 54: Desperate Measures')">ep 54</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep55.mp4', 'Episode 55: The New Dawn')">ep 55</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep56.mp4', 'Episode 56: Transformation')">ep 56</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep57.mp4', 'Episode 57: The Divided Soul')">ep 57</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep58.mp4', 'Episode 58: The King\'s Seal')">ep 58</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep59.mp4', 'Episode 59: The Final Getsuga Tensho')">ep 59</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep60.mp4', 'Episode 60: The Sacrifice')">ep 60</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep61.mp4', 'Episode 61: New Life')">ep 61</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep62.mp4', 'Episode 62: Epilogue Part 1')">ep 62</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep63.mp4', 'Episode 63: Epilogue Part 2')">ep 63</button>
+                </div>
+                <div id="episodes-season-2" class="episode-group">
+                    <button class="button" onclick="playVideo('uploads/bleach_ep64.mp4', 'Episode 64: The Arrancar Introduction')">ep 64</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep65.mp4', 'Episode 65: Grimmjow\'s Attack')">ep 65</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep66.mp4', 'Episode 66: The Departure')">ep 66</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep67.mp4', 'Episode 67: The Return')">ep 67</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep68.mp4', 'Episode 68: Shinigami\'s Secret')">ep 68</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep69.mp4', 'Episode 69: Ulquiorra\'s Appearance')">ep 69</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep70.mp4', 'Episode 70: The Broken Sword')">ep 70</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep71.mp4', 'Episode 71: The Invisible Enemy')">ep 71</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep72.mp4', 'Episode 72: Nnoitra vs. Ichigo')">ep 72</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep73.mp4', 'Episode 73: The Dark Past')">ep 73</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep74.mp4', 'Episode 74: Szayelaporro\'s Trap')">ep 74</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep75.mp4', 'Episode 75: The Strongest Enemy')">ep 75</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep76.mp4', 'Episode 76: Ichigo\'s Resolution')">ep 76</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep77.mp4', 'Episode 77: Aizen\'s Mastery')">ep 77</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep78.mp4', 'Episode 78: The Hogyoku\'s Power')">ep 78</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep79.mp4', 'Episode 79: Orihime\'s Strength')">ep 79</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep80.mp4', 'Episode 80: The Price of Power')">ep 80</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep81.mp4', 'Episode 81: Ichigo\'s Despair')">ep 81</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep82.mp4', 'Episode 82: Tensa Zangetsu')">ep 82</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep83.mp4', 'Episode 83: The Final Flash')">ep 83</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep84.mp4', 'Episode 84: Aizen Defeated')">ep 84</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep85.mp4', 'Episode 85: The Aftermath')">ep 85</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep86.mp4', 'Episode 86: Arrancar Arc Conclusion')">ep 86</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep87.mp4', 'Episode 87: New Beginnings')">ep 87</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep88.mp4', 'Episode 88: Seventeen Months Later')">ep 88</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep89.mp4', 'Episode 89: Fullbringer Power')">ep 89</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep90.mp4', 'Episode 90: Chad\'s Fullbringer')">ep 90</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep91.mp4', 'Episode 91: Uryu\'s Return')">ep 91</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep92.mp4', 'Episode 92: The Fullbringer Organization')">ep 92</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep93.mp4', 'Episode 93: Ichigo\'s Fullbringer Awakens')">ep 93</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep94.mp4', 'Episode 94: The Betrayal')">ep 94</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep95.mp4', 'Episode 95: Ginjo\'s Truth')">ep 95</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep96.mp4', 'Episode 96: The Shinigami Powers Return')">ep 96</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep97.mp4', 'Episode 97: Fullbringer Arc Conclusion')">ep 97</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep98.mp4', 'Episode 98: Soul Society\'s Crisis')">ep 98</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep99.mp4', 'Episode 99: The Quincy Empire')">ep 99</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep100.mp4', 'Episode 100: Thousand-Year Blood War Part 1')">ep 100</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep101.mp4', 'Episode 101: Quincy Invasion')">ep 101</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep102.mp4', 'Episode 102: The Enemy Within')">ep 102</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep103.mp4', 'Episode 103: Yhwach\'s Awakening')">ep 103</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep104.mp4', 'Episode 104: The Shadow Ascends')">ep 104</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep105.mp4', 'Episode 105: Desperate Measures')">ep 105</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep106.mp4', 'Episode 106: Unity')">ep 106</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep107.mp4', 'Episode 107: The Final Battle')">ep 107</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep108.mp4', 'Episode 108: The Thousand-Year Promise')">ep 108</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep109.mp4', 'Episode 109: Resolution')">ep 109</button>
+                </div>
+                <div id="episodes-season-3" class="episode-group">
+                    <button class="button" onclick="playVideo('uploads/bleach_ep110.mp4', 'Episode 110: Thousand-Year Blood War Part 2 Begins')">ep 110</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep111.mp4', 'Episode 111: Yhwach\'s Ascendance')">ep 111</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep112.mp4', 'Episode 112: Soul Society Under Attack')">ep 112</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep113.mp4', 'Episode 113: The Quincy Invasion')">ep 113</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep114.mp4', 'Episode 114: Desperate Defense')">ep 114</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep115.mp4', 'Episode 115: Captains Unite')">ep 115</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep116.mp4', 'Episode 116: The Shadow Intensifies')">ep 116</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep117.mp4', 'Episode 117: Quincy King\'s Power')">ep 117</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep118.mp4', 'Episode 118: Zangetsu\'s Form')">ep 118</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep119.mp4', 'Episode 119: Ichigo\'s Transformation')">ep 119</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep120.mp4', 'Episode 120: True Bankai')">ep 120</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep121.mp4', 'Episode 121: The Final Getsuga Tensho')">ep 121</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep122.mp4', 'Episode 122: Power Unleashed')">ep 122</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep123.mp4', 'Episode 123: Gotei 13 Reborn')">ep 123</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep124.mp4', 'Episode 124: Captain\'s Resolution')">ep 124</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep125.mp4', 'Episode 125: The Clash of Titans')">ep 125</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep126.mp4', 'Episode 126: Combined Force')">ep 126</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep127.mp4', 'Episode 127: Royal Palace Invasion')">ep 127</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep128.mp4', 'Episode 128: Soul King Palace')">ep 128</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep129.mp4', 'Episode 129: The Truth Revealed')">ep 129</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep130.mp4', 'Episode 130: Yhwach\'s Ultimate Goal')">ep 130</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep131.mp4', 'Episode 131: The Antithesis')">ep 131</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep132.mp4', 'Episode 132: Final Stand')">ep 132</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep133.mp4', 'Episode 133: The Last Battle')">ep 133</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep134.mp4', 'Episode 134: Soul Reapers\' Determination')">ep 134</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep135.mp4', 'Episode 135: Fullbringer\'s Strength')">ep 135</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep136.mp4', 'Episode 136: The Sacrifice')">ep 136</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep137.mp4', 'Episode 137: Hollow Ichigo Unleashed')">ep 137</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep138.mp4', 'Episode 138: Zangetsu\'s Awakening')">ep 138</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep139.mp4', 'Episode 139: The True Power')">ep 139</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep140.mp4', 'Episode 140: Yhwach\'s Fear')">ep 140</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep141.mp4', 'Episode 141: The King\'s Seal')">ep 141</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep142.mp4', 'Episode 142: Destruction')">ep 142</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep143.mp4', 'Episode 143: The Void')">ep 143</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep144.mp4', 'Episode 144: Despair')">ep 144</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep145.mp4', 'Episode 145: Hope Rekindled')">ep 145</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep146.mp4', 'Episode 146: The Dawn')">ep 146</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep147.mp4', 'Episode 147: New Worlds')">ep 147</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep148.mp4', 'Episode 148: Final Confrontation Part 1')">ep 148</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep149.mp4', 'Episode 149: Final Confrontation Part 2')">ep 149</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep150.mp4', 'Episode 150: Final Confrontation Part 3')">ep 150</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep151.mp4', 'Episode 151: The Ultimate Clash')">ep 151</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep152.mp4', 'Episode 152: Thousand-Year Blood War Conclusion')">ep 152</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep153.mp4', 'Episode 153: The Epilogue Begins')">ep 153</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep154.mp4', 'Episode 154: Ten Years Later')">ep 154</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep155.mp4', 'Episode 155: New Beginnings')">ep 155</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep156.mp4', 'Episode 156: The Peace')">ep 156</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep157.mp4', 'Episode 157: Memories')">ep 157</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep158.mp4', 'Episode 158: The Future')">ep 158</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep159.mp4', 'Episode 159: New Generations')">ep 159</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep160.mp4', 'Episode 160: Legacy')">ep 160</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep161.mp4', 'Episode 161: The Next Chapter Part 1')">ep 161</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep162.mp4', 'Episode 162: The Next Chapter Part 2')">ep 162</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep163.mp4', 'Episode 163: The Next Chapter Part 3')">ep 163</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep164.mp4', 'Episode 164: Continuation')">ep 164</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep165.mp4', 'Episode 165: Bonds')">ep 165</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep166.mp4', 'Episode 166: Connection')">ep 166</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep167.mp4', 'Episode 167: Infinite')">ep 167</button>
+                </div>
+                <div id="episodes-season-4" class="episode-group">
+                    <button class="button" onclick="playVideo('uploads/bleach_ep168.mp4', 'Episode 168: The War Continues Part 1')">ep 168</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep169.mp4', 'Episode 169: The War Continues Part 2')">ep 169</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep170.mp4', 'Episode 170: The War Continues Part 3')">ep 170</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep171.mp4', 'Episode 171: Quincy Power')">ep 171</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep172.mp4', 'Episode 172: Sternritter Reveals')">ep 172</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep173.mp4', 'Episode 173: Captain\'s Sacrifice')">ep 173</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep174.mp4', 'Episode 174: Gotei 13 Counterattack')">ep 174</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep175.mp4', 'Episode 175: Shadow\'s Judgment')">ep 175</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep176.mp4', 'Episode 176: Power Escalation')">ep 176</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep177.mp4', 'Episode 177: The Royal Guard\'s Strength')">ep 177</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep178.mp4', 'Episode 178: Ichigo\'s Growth')">ep 178</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep179.mp4', 'Episode 179: Soul King\'s Fragment')">ep 179</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep180.mp4', 'Episode 180: The Zero Squad')">ep 180</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep181.mp4', 'Episode 181: Divine Training')">ep 181</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep182.mp4', 'Episode 182: True Strength')">ep 182</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep183.mp4', 'Episode 183: Ichigo Returns')">ep 183</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep184.mp4', 'Episode 184: New Power Unleashed')">ep 184</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep185.mp4', 'Episode 185: The Assault Intensifies')">ep 185</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep186.mp4', 'Episode 186: Sternritter Battles')">ep 186</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep187.mp4', 'Episode 187: The Holy Alphabet')">ep 187</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep188.mp4', 'Episode 188: Quincy Complete Form')">ep 188</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep189.mp4', 'Episode 189: Desperate Moment')">ep 189</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep190.mp4', 'Episode 190: The Last Stand')">ep 190</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep191.mp4', 'Episode 191: Yhwach\'s Plan')">ep 191</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep192.mp4', 'Episode 192: The Future\'s Destruction')">ep 192</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep193.mp4', 'Episode 193: Almighty')">ep 193</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep194.mp4', 'Episode 194: Soul King\'s Protection')">ep 194</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep195.mp4', 'Episode 195: Ichigo\'s Resolve')">ep 195</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep196.mp4', 'Episode 196: The Last Sword')">ep 196</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep197.mp4', 'Episode 197: Combined Assault')">ep 197</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep198.mp4', 'Episode 198: Captains\' Fury')">ep 198</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep199.mp4', 'Episode 199: The End Approaches')">ep 199</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep200.mp4', 'Episode 200: The Thousand Years')">ep 200</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep201.mp4', 'Episode 201: Yama\'s Sacrifice')">ep 201</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep202.mp4', 'Episode 202: The Price of Fire')">ep 202</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep203.mp4', 'Episode 203: Soul Society\'s Hope')">ep 203</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep204.mp4', 'Episode 204: The Next Generation')">ep 204</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep205.mp4', 'Episode 205: Shinigami Awakening')">ep 205</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep206.mp4', 'Episode 206: Royal Palace Falls')">ep 206</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep207.mp4', 'Episode 207: The Shadow Deepens')">ep 207</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep208.mp4', 'Episode 208: Spirit Realm Crisis')">ep 208</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep209.mp4', 'Episode 209: Ichigo\'s Determination')">ep 209</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep210.mp4', 'Episode 210: The Chosen One')">ep 210</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep211.mp4', 'Episode 211: Final Clash Begins')">ep 211</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep212.mp4', 'Episode 212: The King\'s Power')">ep 212</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep213.mp4', 'Episode 213: Zangetsu Revealed')">ep 213</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep214.mp4', 'Episode 214: The Merge')">ep 214</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep215.mp4', 'Episode 215: New Soul Reaper')">ep 215</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep216.mp4', 'Episode 216: Power Ascension')">ep 216</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep217.mp4', 'Episode 217: The Invisible Enemy Struck Down')">ep 217</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep218.mp4', 'Episode 218: The Soul King Sacrifice')">ep 218</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep219.mp4', 'Episode 219: Infinite Dark')">ep 219</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep220.mp4', 'Episode 220: The Future Black')">ep 220</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep221.mp4', 'Episode 221: Ichigo Crosses Swords')">ep 221</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep222.mp4', 'Episode 222: Yhwach Defeated')">ep 222</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep223.mp4', 'Episode 223: The Aftermath Begins')">ep 223</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep224.mp4', 'Episode 224: The Battle Ends')">ep 224</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep225.mp4', 'Episode 225: Epilogue Starts')">ep 225</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep226.mp4', 'Episode 226: Rebuilding Begins')">ep 226</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep227.mp4', 'Episode 227: Peace Descends')">ep 227</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep228.mp4', 'Episode 228: Years Pass')">ep 228</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep229.mp4', 'Episode 229: The New Era')">ep 229</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep230.mp4', 'Episode 230: Hidden Developments')">ep 230</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep231.mp4', 'Episode 231: Lives Continue')">ep 231</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep232.mp4', 'Episode 232: New Paths')">ep 232</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep233.mp4', 'Episode 233: The Next Chapter')">ep 233</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep234.mp4', 'Episode 234: Final Peace')">ep 234</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep235.mp4', 'Episode 235: Eternal Bond')">ep 235</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep236.mp4', 'Episode 236: Forever Changed')">ep 236</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep237.mp4', 'Episode 237: Continuation of Life')">ep 237</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep238.mp4', 'Episode 238: The World After')">ep 238</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep239.mp4', 'Episode 239: Connected Hearts')">ep 239</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep240.mp4', 'Episode 240: Eternal Spirits')">ep 240</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep241.mp4', 'Episode 241: The Living Dream')">ep 241</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep242.mp4', 'Episode 242: Soul Echoes')">ep 242</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep243.mp4', 'Episode 243: Harmony Restored')">ep 243</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep244.mp4', 'Episode 244: Between Worlds')">ep 244</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep245.mp4', 'Episode 245: The Hidden Truth')">ep 245</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep246.mp4', 'Episode 246: Revelation Moment')">ep 246</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep247.mp4', 'Episode 247: Walking Forward')">ep 247</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep248.mp4', 'Episode 248: Promise Kept')">ep 248</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep249.mp4', 'Episode 249: Unending Journey')">ep 249</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep250.mp4', 'Episode 250: Forever Forward')">ep 250</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep251.mp4', 'Episode 251: The Melody of Souls')">ep 251</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep252.mp4', 'Episode 252: Blades Dance')">ep 252</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep253.mp4', 'Episode 253: The Shining Stars')">ep 253</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep254.mp4', 'Episode 254: Infinite Kindness')">ep 254</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep255.mp4', 'Episode 255: The Guardian\'s Pride')">ep 255</button>
+                </div>
+                <div id="episodes-season-5" class="episode-group">
+                    <button class="button" onclick="playVideo('uploads/bleach_ep256.mp4', 'Episode 256: The Next Generation Begins')">ep 256</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep257.mp4', 'Episode 257: New Soul Reapers')">ep 257</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep258.mp4', 'Episode 258: Academy Students')">ep 258</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep259.mp4', 'Episode 259: Karakura\'s Peace')">ep 259</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep260.mp4', 'Episode 260: One Year Later')">ep 260</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep261.mp4', 'Episode 261: New Student Council')">ep 261</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep262.mp4', 'Episode 262: Soul Society News')">ep 262</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep263.mp4', 'Episode 263: The Future\'s Promise')">ep 263</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep264.mp4', 'Episode 264: Bleach\'s Message')">ep 264</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep265.mp4', 'Episode 265: Bonds Forever')">ep 265</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep266.mp4', 'Episode 266: Hearts Connected')">ep 266</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep267.mp4', 'Episode 267: Eternity')">ep 267</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep268.mp4', 'Episode 268: The Soul Society\'s New Path')">ep 268</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep269.mp4', 'Episode 269: Memories of Battle')">ep 269</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep270.mp4', 'Episode 270: Ichigo\'s Future')">ep 270</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep271.mp4', 'Episode 271: The Protector')">ep 271</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep272.mp4', 'Episode 272: Friends Forever')">ep 272</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep273.mp4', 'Episode 273: The Shinigami Legacy')">ep 273</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep274.mp4', 'Episode 274: Between Realms')">ep 274</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep275.mp4', 'Episode 275: The Spirit\'s Call')">ep 275</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep276.mp4', 'Episode 276: Hidden Trials')">ep 276</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep277.mp4', 'Episode 277: The Way Forward')">ep 277</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep278.mp4', 'Episode 278: Trials of the Soul')">ep 278</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep279.mp4', 'Episode 279: The Unending Story')">ep 279</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep280.mp4', 'Episode 280: Whispers in the Wind')">ep 280</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep281.mp4', 'Episode 281: The Eternal Flame')">ep 281</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep282.mp4', 'Episode 282: Destiny\'s Design')">ep 282</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep283.mp4', 'Episode 283: The Soul\'s Awakening')">ep 283</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep284.mp4', 'Episode 284: Light and Shadow')">ep 284</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep285.mp4', 'Episode 285: The Truth of Power')">ep 285</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep286.mp4', 'Episode 286: Strength in Numbers')">ep 286</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep287.mp4', 'Episode 287: Unbreakable Bonds')">ep 287</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep288.mp4', 'Episode 288: The New Order')">ep 288</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep289.mp4', 'Episode 289: Hidden Secrets')">ep 289</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep290.mp4', 'Episode 290: Guardian\'s Oath')">ep 290</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep291.mp4', 'Episode 291: The Spectral Dance')">ep 291</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep292.mp4', 'Episode 292: Dreams Renewed')">ep 292</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep293.mp4', 'Episode 293: The Sacred Path')">ep 293</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep294.mp4', 'Episode 294: Souls Intertwined')">ep 294</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep295.mp4', 'Episode 295: The Endless Horizon')">ep 295</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep296.mp4', 'Episode 296: Within the Veil')">ep 296</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep297.mp4', 'Episode 297: Echoes of Victory')">ep 297</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep298.mp4', 'Episode 298: The New World')">ep 298</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep299.mp4', 'Episode 299: Where Hearts Gather')">ep 299</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep300.mp4', 'Episode 300: Century\'s End')">ep 300</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep301.mp4', 'Episode 301: A New Beginning')">ep 301</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep302.mp4', 'Episode 302: The Spirit Flows')">ep 302</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep303.mp4', 'Episode 303: Endless Night')">ep 303</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep304.mp4', 'Episode 304: Beautiful Lies')">ep 304</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep305.mp4', 'Episode 305: The Soft Sky')">ep 305</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep306.mp4', 'Episode 306: Stars Descending')">ep 306</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep307.mp4', 'Episode 307: Thoughts of Tomorrow')">ep 307</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep308.mp4', 'Episode 308: The Endless Dark')">ep 308</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep309.mp4', 'Episode 309: Breathless Chaos')">ep 309</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep310.mp4', 'Episode 310: Swirling Storm')">ep 310</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep311.mp4', 'Episode 311: The Hero\'s Fall')">ep 311</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep312.mp4', 'Episode 312: When the Smoke Clears')">ep 312</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep313.mp4', 'Episode 313: The Gentle Massacre')">ep 313</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep314.mp4', 'Episode 314: Moment of Truth')">ep 314</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep315.mp4', 'Episode 315: Reborn Reality')">ep 315</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep316.mp4', 'Episode 316: The Final Vision')">ep 316</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep317.mp4', 'Episode 317: The Thousand Year Ending')">ep 317</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep318.mp4', 'Episode 318: The New Captain Commander')">ep 318</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep319.mp4', 'Episode 319: The Unfading Memories')">ep 319</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep320.mp4', 'Episode 320: The Endless White')">ep 320</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep321.mp4', 'Episode 321: The Perfect Stillness')">ep 321</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep322.mp4', 'Episode 322: The Sound of Silence')">ep 322</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep323.mp4', 'Episode 323: Between Yesterday and Tomorrow')">ep 323</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep324.mp4', 'Episode 324: Fragments of the Whole')">ep 324</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep325.mp4', 'Episode 325: The Invisible Wave')">ep 325</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep326.mp4', 'Episode 326: Sleepless Memory')">ep 326</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep327.mp4', 'Episode 327: The Beautiful Bridge')">ep 327</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep328.mp4', 'Episode 328: Eternal Bond Forever')">ep 328</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep329.mp4', 'Episode 329: The Forever Love')">ep 329</button>
+                    <button class="button" onclick="playVideo('uploads/bleach_ep330.mp4', 'Episode 330: Beyond the Soul\'s Horizon - The End')">ep 330</button>
+                </div>
+            </div>
+            
+            <!-- Comments Section -->
+            <section class="comments-section">
+                <h2 style="color: #4cc9f0; margin-top: 40px; font-size: 1.8rem;">Comments</h2>
+                <div class="comments-container">
+                    <div class="comment-form">
+                        <textarea id="comment-text" placeholder="Share your thoughts about this anime..." style="width: 100%; height: 100px; padding: 12px; border-radius: 8px; border: 1px solid #4cc9f0; background: #232531; color: #fff; font-family: 'Segoe UI', Arial; resize: vertical;"></textarea>
+                        <button onclick="addComment()" style="background: #4cc9f0; color: #fff; border: none; padding: 10px 20px; margin-top: 10px; border-radius: 8px; cursor: pointer; font-weight: 600;">Post Comment</button>
+                    </div>
+                    <div id="comments-list" style="margin-top: 20px;">
+                        <!-- Comments will appear here -->
+                    </div>
+                </div>
+            </section>
+            
+            <div style="text-align: center; margin: 40px 0;">
+                <button onclick="document.getElementById('recommend-section').scrollIntoView({ behavior: 'smooth' })" style="background: #4cc9f0; color: #fff; border: none; padding: 12px 28px; font-size: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s;">
+                    <i class="fas fa-heart"></i> View Recommended Anime
+                </button>
+            </div>
+            
+            <div class="recommend-section" id="recommend-section">
+                <div class="recommend-title">Recommended Anime</div>
+                <div class="recommend-list">
+                    <div class="anime-card">
+                        <a href="aot.html"><img src="aot.jpg" alt="Attack on Titan"></a>
+                        <h3>Attack on Titan</h3>
+                        <p>Humanity fights for survival against giant Titans.</p>
+                    </div>
+                    <div class="anime-card">
+                        <a href="naruto.html"><img src="naruto.jpg" alt="Naruto"></a>
+                        <h3>Naruto</h3>
+                        <p>A ninja's journey to become Hokage.</p>
+                    </div>
+                    <div class="anime-card">
+                        <a href="onepiece.html"><img src="download.jpg" alt="One Piece"></a>
+                        <h3>One Piece</h3>
+                        <p>Pirates search for the legendary treasure.</p>
+                    </div>
+                    <div class="anime-card">
+                        <a href="danmachi.html"><img src="danmachi.jpg" alt="Danmachi"></a>
+                        <h3>Danmachi</h3>
+                        <p>Adventures in the dungeon city of Orario.</p>
+                    </div>
+                    <div class="anime-card">
+    <a href="boruto.html"><img src="boruto.jpg" alt="Boruto"></a>
+    <h3>Boruto: Naruto Next Generations</h3>
+    <p>The next generation of shinobi fights to protect Hidden Leaf Village.</p>
+</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div>
+
+            Owned and operated by koushik vardhan | 
+            <a href="tel:9390956911" style="color:#4cc9f0;">9390956911</a> | 
+            <a href="mailto:koushikvardhan2006@gmail.com" style="color:#4cc9f0;">koushikvardhan2006@gmail.com</a> | 
+            <span>andhra pradesh, india - 533005</span>
+        </div>
+    </footer>
+    <script>
+        // Navbar mobile toggle
+        const menuBars = document.getElementById('menu-bars');
+        const navbar = document.getElementById('navbar');
+        if (menuBars && navbar) {
+            menuBars.onclick = function(e) {
+                e.stopPropagation();
+                navbar.classList.toggle('show');
+            };
+            document.addEventListener('click', function(e) {
+                if (!navbar.contains(e.target) && !menuBars.contains(e.target)) {
+                    navbar.classList.remove('show');
+                }
+            });
+        }
+        // Search functionality
+        const searchIcon = document.getElementById('search-icons');
+        const searchBar = document.getElementById('search-bar');
+        const searchInput = document.getElementById('search-input');
+        const searchSuggestions = document.getElementById('search-suggestions');
+        
+        const animeData = {
+            'naruto': { title: 'Naruto', img: 'naruto.jpg', url: 'naruto.html', alias: ['naruto'] },
+            'bleach': { title: 'Bleach', img: 'bleach.jpg', url: 'bleach.html', alias: ['bleach'] },
+            'danmachi': { title: 'Danmachi', img: 'danmachi.jpg', url: 'danmachi.html', alias: ['danmachi'] },
+            'aot': { title: 'Attack on Titan', img: 'aot.jpg', url: 'aot.html', alias: ['aot', 'attack on titan'] },
+            'onepiece': { title: 'One Piece', img: 'download.jpg', url: 'onepiece.html', alias: ['onepiece', 'one piece'] },
+            'boruto': { title: 'Boruto', img: 'boruto.jpg', url: 'boruto.html', alias: ['boruto'] }
+        };
+        
+        if (searchIcon) {
+            searchIcon.onclick = function(e) {
+                e.stopPropagation();
+                searchBar.classList.toggle('active');
+                if (searchBar.classList.contains('active')) {
+                    searchInput.focus();
+                }
+            };
+        }
+        
+        searchInput.addEventListener('input', function() {
+            const value = this.value.toLowerCase().trim();
+            searchSuggestions.innerHTML = '';
+            
+            if (value.length === 0) {
+                searchSuggestions.classList.remove('show');
+                return;
+            }
+            
+            const filtered = Object.entries(animeData).filter(([key, anime]) => 
+                anime.title.toLowerCase().includes(value) || 
+                anime.alias.some(alias => alias.startsWith(value))
+            );
+            
+            if (filtered.length > 0) {
+                filtered.forEach(([key, anime]) => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.innerHTML = `<img src="${anime.img}" alt="${anime.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22%3E%3Crect fill=%22%23333%22 width=%22120%22 height=%22120%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'"><div class="suggestion-title">${anime.title}</div>`;
+                    item.onclick = function(e) {
+                        e.stopPropagation();
+                        window.location.href = anime.url;
+                    };
+                    searchSuggestions.appendChild(item);
+                });
+                searchSuggestions.classList.add('show');
+            } else {
+                searchSuggestions.classList.remove('show');
+            }
+        });
+        
+        function selectSuggestion(anime) {
+            searchInput.value = anime;
+            searchAnime();
+        }
+        
+        function searchAnime() {
+            const query = searchInput.value.toLowerCase();
+            if (!query) return;
+            const animeMap = {
+                'naruto': 'naruto.html',
+                'bleach': 'bleach.html',
+                'danmachi': 'danmachi.html',
+                'aot': 'aot.html',
+                'attack on titan': 'aot.html',
+                'onepiece': 'onepiece.html',
+                'one piece': 'onepiece.html',
+                'boruto': 'boruto.html',
+                'deathnote': 'deathnote.html',
+                'demon slayer': 'demonslayer.html',
+                'solo leveling': 'sololeveling.html',
+                'fairy tail': 'fairytail.html',
+                'one punchman': 'onepunchman.html',
+                'jojo': 'jojo.html',
+                'dragonball': 'dragonball.html',
+                'my hero academia': 'myheroacademia.html',
+                'hunter x hunter': 'hunterxhunter.html',
+                'black clover': 'blackclover.html'
+            };
+            if (animeMap[query]) {
+                window.location.href = animeMap[query];
+            } else {
+                alert('Anime not found. Try: naruto, bleach, danmachi, aot, or onepiece');
+            }
+        }
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchAnime();
+        });
+        document.addEventListener('click', function(e) {
+            if (!searchBar.contains(e.target) && e.target !== searchIcon) {
+                searchBar.classList.remove('active');
+                searchSuggestions.classList.remove('show');
+            }
+        });
+        // Play video and show episode title
+        function playVideo(src, title) {
+            var videoPlayer = document.getElementById("videoPlayer");
+            videoPlayer.src = src;
+            videoPlayer.play();
+            document.getElementById('episode-title').textContent = title;
+        }
+        // Load comments from localStorage
+        function loadComments() {
+            const comments = JSON.parse(localStorage.getItem('bleach-comments')) || [];
+            const commentsList = document.getElementById('comments-list');
+            commentsList.innerHTML = '';
+            comments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.style.cssText = 'background: #232531; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #4cc9f0;';
+                commentDiv.innerHTML = `
+                    <p style="margin: 0 0 8px 0; color: #4cc9f0; font-weight: bold;">${comment.date}</p>
+                    <p style="margin: 0; color: #fff;">${comment.text}</p>
+                `;
+                commentsList.appendChild(commentDiv);
+            });
+        }
+        // Add new comment
+        function addComment() {
+            const text = document.getElementById('comment-text').value.trim();
+            if (!text) {
+                alert('Please write a comment!');
+                return;
+            }
+            const comments = JSON.parse(localStorage.getItem('bleach-comments')) || [];
+            const now = new Date().toLocaleString();
+            comments.unshift({ text, date: now });
+            localStorage.setItem('bleach-comments', JSON.stringify(comments));
+            document.getElementById('comment-text').value = '';
+            loadComments();
+        }
+        // Load comments on page load
+        window.addEventListener('DOMContentLoaded', loadComments);
+        document.querySelectorAll('.range-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.episode-group').forEach(g => g.classList.remove('active'));
+                document.getElementById('episodes-' + this.dataset.range).classList.add('active');
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.episode-group').forEach(g => g.classList.remove('active'));
+            document.querySelector('.range-btn[data-range="season-1"]').classList.add('active');
+            document.getElementById('episodes-season-1').classList.add('active');
+        });
+        // Jump to episode function
+        function jumpToEpisode() {
+            const ep = parseInt(document.getElementById('ep-jump').value);
+            if (isNaN(ep) || ep < 1 || ep > 330) {
+                alert('Enter a valid episode number (1â€“330).');
+                return;
+            }
+            
+            let season;
+            if (ep <= 63) season = 'season-1';
+            else if (ep <= 109) season = 'season-2';
+            else if (ep <= 167) season = 'season-3';
+            else if (ep <= 255) season = 'season-4';
+            else season = 'season-5';
+            
+            document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.episode-group').forEach(g => g.classList.remove('active'));
+            document.querySelector(`.range-btn[data-range="${season}"]`).classList.add('active');
+            document.getElementById(`episodes-${season}`).classList.add('active');
+            
+            // Find and click the episode button by looking for the correct button in the active episode group
+            const episodeGroup = document.getElementById(`episodes-${season}`);
+            const buttons = episodeGroup.querySelectorAll('.button');
+            
+            // Find button by episode number in its text content
+            for (let btn of buttons) {
+                const text = btn.textContent || btn.innerText;
+                if (text.includes(`ep ${ep}`) || text.includes(`Episode ${ep}`)) {
+                    btn.click();
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    break;
+                }
+            }
+        }
+        document.getElementById('ep-jump').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                jumpToEpisode();
+            }
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <script>
+    (function() {
+        let lastScroll = 0;
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', function() {
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+            if (!header) return;
+            if (currentScroll > lastScroll && currentScroll > 60) {
+                header.classList.add('navbar-hidden');
+            } else {
+                header.classList.remove('navbar-hidden');
+            }
+            lastScroll = currentScroll;
+        }, { passive: true });
+    })();
+    </script>
+    <script>
+    // Add favorites heart to anime cards
+    (function(){
+      function loadFavorites(){
+        try{ return JSON.parse(localStorage.getItem('favorites')||'[]'); }catch(e){ return []; }
+      }
+      function saveFavorites(list){ localStorage.setItem('favorites', JSON.stringify(list||[])); }
+      function isFavorited(url){ const list = loadFavorites(); return !!list.find(f=>f.url === url); }
+      
+      document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('.anime-card').forEach(card=>{
+          if(card.querySelector('.card-fav')) return;
+          const link = card.querySelector('a[href]');
+          if(!link) return;
+          const url = link.getAttribute('href');
+          const h = card.querySelector('h3');
+          const title = h ? h.textContent.trim() : url;
+          
+          const btn = document.createElement('button');
+          btn.className = isFavorited(url) ? 'card-fav' : 'card-fav not-fav';
+          btn.innerHTML = '<i class="' + (isFavorited(url) ? 'fas' : 'far') + ' fa-heart"></i>';
+          btn.style.cssText = 'position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.5);border:none;padding:6px;border-radius:8px;cursor:pointer;z-index:50;';
+          
+          btn.addEventListener('click', function(e){
+            e.preventDefault(); 
+            e.stopPropagation();
+            const list = loadFavorites();
+            const idx = list.findIndex(f=>f.url===url);
+            if(idx>=0){
+              list.splice(idx, 1);
+              btn.classList.add('not-fav');
+              btn.innerHTML = '<i class="far fa-heart"></i>';
+            } else {
+              list.unshift({ title, url });
+              btn.classList.remove('not-fav');
+              btn.innerHTML = '<i class="fas fa-heart"></i>';
+            }
+            saveFavorites(list);
+          });
+          
+          card.style.position = 'relative';
+          card.insertBefore(btn, card.firstChild);
+        });
+      });
+    })();
+    
+    // Favorites button navigation
+    const favoritesBtn = document.getElementById('favorites-btn');
+    if (favoritesBtn) {
+      favoritesBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'favorites.html';
+      });
+    }
+
+    // User login/logout functionality
+    const userIcon = document.getElementById('user-icon');
+    const userMenu = document.getElementById('user-menu');
+    const userMenuContent = document.getElementById('user-menu-content');
+
+    function updateUserMenu() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser && currentUser.loggedIn) {
+            userMenuContent.innerHTML = `
+                <div class="user-menu-item" style="padding:10px;border-bottom:1px solid #4cc9f0;color:#4cc9f0;font-weight:600;">
+                    Welcome, ${currentUser.username}!
+                </div>
+                <button id="logoutBtn" style="width:100%;padding:10px;background:#ff7b9a;border:none;color:#fff;cursor:pointer;font-weight:600;border-radius:4px;">Logout</button>
+            `;
+            setTimeout(() => {
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', logout);
+                }
+            }, 0);
+        } else {
+            userMenuContent.innerHTML = `
+                <a href="login.html" style="display:block;padding:10px;color:#4cc9f0;text-decoration:none;text-align:center;border-bottom:1px solid #4cc9f0;font-weight:600;">Login</a>
+                <a href="sign up.html" style="display:block;padding:10px;color:#4cc9f0;text-decoration:none;text-align:center;font-weight:600;">Sign Up</a>
+            `;
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('rememberMe');
+        updateUserMenu();
+        userMenu.classList.remove('show');
+        window.location.href = window.location.href;
+    }
+
+    if (userIcon && userMenu) {
+        userIcon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userMenu.classList.toggle('show');
+            if (userMenu.classList.contains('show')) {
+                userMenu.setAttribute('aria-hidden', 'false');
+            } else {
+                userMenu.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!userMenu.contains(e.target) && e.target !== userIcon && !userIcon.contains(e.target)) {
+                userMenu.classList.remove('show');
+                userMenu.setAttribute('aria-hidden', 'true');
+            }
+        });
+    }
+
+    updateUserMenu();
+    </script>
+    <script src="favorites.js"></script>
+</body>
+</html>

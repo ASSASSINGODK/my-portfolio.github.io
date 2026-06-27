@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>Favorites - Anime</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+		<link rel="stylesheet" href="Assassingodk1.css">
+		<style>
+			main { padding: 120px 40px 60px; max-width:1200px; margin:0 auto; }
+			h1 { color:#fff; margin-bottom:24px; font-size:2rem; }
+			.controls { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+			.fav-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; width:100%; }
+			.fav-card { background: rgba(24,24,24,0.8); border-radius: 12px; padding: 12px; text-align: center; position: relative; transition: transform 0.2s, box-shadow 0.2s; }
+			.fav-card:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 4px 12px rgba(76,201,240,0.3); }
+			.fav-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; display: block; margin-bottom: 8px; }
+			.fav-card h3 { color: #4cc9f0; font-size: 0.95rem; margin: 8px 0 6px 0; }
+			.fav-card-controls { display: flex; gap: 6px; margin-top: 8px; }
+			.fav-btn { background: var(--accent,#4cc9f0); color: #000; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; flex: 1; font-weight: 600; }
+			.fav-btn.remove { background: transparent; color: #ff7b9a; border: 1px solid #ff7b9a; }
+			.fav-btn:hover { opacity: 0.9; }
+			.empty { color: #bbb; padding: 40px; text-align: center; font-size: 1.1rem; }
+			.btn-clear { background: transparent; color: #ff7b9a; border: 1px solid #ff7b9a; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+			.btn-clear:hover { background: rgba(255,123,154,0.1); }
+			@media (max-width: 900px) {
+				.fav-cards { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
+			}
+			@media (max-width: 600px) {
+				main { padding: 100px 16px 40px; }
+				.fav-cards { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+			}
+		</style>
+</head>
+<body>
+<header>
+		<a href="Assassingodk.html" class="logo"><i class="fas fa-infinity"></i>Anime.</a>
+		<nav class="navbar" id="navbar">
+				<a href="Assassingodk.html" id="home-link">home</a>
+				<a href="page2.html" id="anime-link">anime</a>
+		</nav>
+		<div class="icons">
+				<a href="Assassingodk.html" class="fas fa-arrow-left" title="Back"></a>
+		</div>
+</header>
+<main>
+	<div class="controls">
+		<h1 style="margin:0;">Your Favorites</h1>
+		<button class="btn-clear" onclick="clearAllFavorites()" style="display:none;" id="clearBtn">Clear All</button>
+	</div>
+	<div id="favorites-root"></div>
+</main>
+<script>
+(function(){
+	const root = document.getElementById('favorites-root');
+	const clearBtn = document.getElementById('clearBtn');
+	
+	const animeData = {
+		'naruto.html': { title: 'Naruto', img: 'naruto.jpg', alias: ['naruto'] },
+		'bleach.html': { title: 'Bleach', img: 'bleach.jpg', alias: ['bleach'] },
+		'danmachi.html': { title: 'Danmachi', img: 'danmachi.jpg', alias: ['danmachi'] },
+		'aot.html': { title: 'Attack on Titan', img: 'aot.jpg', alias: ['aot', 'attack on titan'] },
+		'onepiece.html': { title: 'One Piece', img: 'download.jpg', alias: ['onepiece', 'one piece'] },
+		'boruto.html': { title: 'Boruto', img: 'boruto.jpg', alias: ['boruto'] }
+	};
+	
+	function loadFavorites(){
+		try{ return JSON.parse(localStorage.getItem('favorites')||'[]'); }catch(e){ return []; }
+	}
+	
+	function saveFavorites(list){ 
+		localStorage.setItem('favorites', JSON.stringify(list||[])); 
+		render(); 
+	}
+	
+	function clearFavorites(){ 
+		localStorage.removeItem('favorites'); 
+		render(); 
+	}
+	
+	function render(){
+		const list = loadFavorites();
+		root.innerHTML = '';
+		clearBtn.style.display = list.length > 0 ? 'block' : 'none';
+		
+		if(!list.length){
+			const empty = document.createElement('div');
+			empty.className = 'empty';
+			empty.innerHTML = '<p>❤️ No favorites yet</p><p style="font-size:0.9rem; color:#999;">Use the heart icon on any page to add favorites.</p>';
+			root.appendChild(empty);
+			return;
+		}
+		
+		const cardsContainer = document.createElement('div');
+		cardsContainer.className = 'fav-cards';
+		
+		list.forEach((f, idx) => {
+			const url = f.url || '#';
+			const anime = animeData[url] || { title: f.title || 'Unknown', img: 'naruto.jpg' };
+			
+			const card = document.createElement('div');
+			card.className = 'fav-card';
+			
+			const img = document.createElement('img');
+			img.src = anime.img;
+			img.alt = anime.title;
+			img.onerror = "this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%22160%22%3E%3Crect fill=%22%23333%22 width=%22160%22 height=%22160%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2216%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'";
+			
+			const title = document.createElement('h3');
+			title.textContent = anime.title;
+			
+			const controls = document.createElement('div');
+			controls.className = 'fav-card-controls';
+			
+			const openBtn = document.createElement('button');
+			openBtn.className = 'fav-btn';
+			openBtn.textContent = 'Open';
+			openBtn.addEventListener('click', function(){ window.location.href = url; });
+			
+			const removeBtn = document.createElement('button');
+			removeBtn.className = 'fav-btn remove';
+			removeBtn.innerHTML = '<i class="fas fa-trash"></i>';
+			removeBtn.title = 'Remove';
+			removeBtn.addEventListener('click', function(){
+				const newList = loadFavorites().filter((_,i)=>i!==idx);
+				saveFavorites(newList);
+			});
+			
+			controls.appendChild(openBtn);
+			controls.appendChild(removeBtn);
+			
+			card.appendChild(img);
+			card.appendChild(title);
+			card.appendChild(controls);
+			cardsContainer.appendChild(card);
+		});
+		
+		root.appendChild(cardsContainer);
+	}
+	
+	window.clearAllFavorites = function(){
+		if(confirm('Remove all favorites?')) clearFavorites();
+	};
+	
+	render();
+})();
+</script>
+</body>
+</html>

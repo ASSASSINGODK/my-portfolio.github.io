@@ -1,0 +1,559 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>♾️Anime</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="Assassingodk1.css">
+    <style>
+        html, body {
+            background: #181a20;
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0; padding: 0; height: 100%; width: 100%;
+        }
+        header {
+            width: 100%;
+            padding: 20px 40px;
+            background: #1c1f26;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .logo {
+            color: #4cc9f0;
+            font-size: 2rem;
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        .logo i { margin-right: 8px; }
+        .navbar {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            background: #232531;
+            position: absolute;
+            top: 70px;
+            right: 40px;
+            border-radius: 10px;
+            padding: 20px;
+            min-width: 150px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+            z-index: 2000;
+        }
+        .navbar.show { display: flex; }
+        .navbar a {
+            color: #fff; text-decoration: none; font-size: 1.1rem; font-weight: 500;
+            padding: 8px 12px; border-radius: 4px; transition: background 0.2s;
+        }
+        .navbar a.active, .navbar a:hover {
+            background: #4cc9f0; color: #000;
+        }
+        .icons {
+            display: flex; align-items: center; gap: 18px; font-size: 1.5rem; color: #fff;
+        }
+        .search-bar { display: none; flex-direction: column; gap: 8px; background: #232531; padding: 8px 12px; border-radius: 8px; border: 1px solid #4cc9f0; position: absolute; top: 70px; right: 40px; z-index: 1999; }
+        .search-bar.active { display: flex !important; }
+        .search-bar input { background: transparent; border: none; color: #fff; outline: none; width: 180px; font-size: 1rem; }
+        .search-bar input::placeholder { color: #999; }
+        .search-bar button { background: #4cc9f0; border: none; color: #000; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .search-bar button:hover { background: #258baf; color: #fff; }
+        .search-input-wrapper { display: flex; align-items: center; gap: 8px; }
+        .search-suggestions { display: none; max-height: 200px; overflow-y: auto; border-top: 1px solid #4cc9f0; margin-top: 8px; }
+        .search-suggestions.show { display: block; }
+        .suggestion-item { padding: 8px 12px; color: #fff; cursor: pointer; border-bottom: 1px solid #333; }
+        .suggestion-item:hover { background: #4cc9f0; color: #000; }
+        .search-icon { cursor: pointer; z-index: 10; pointer-events: auto; }
+        .menu-icon { font-size: 2rem; cursor: pointer; color: #4cc9f0; }
+
+        main {
+            width: 100vw;
+            min-height: 100vh;
+            box-sizing: border-box;
+            padding-top: 110px;
+        }
+        .main-content {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px 40px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Anime Slider */
+        .anime-slider {
+            position: relative;
+            width: 100vw;
+            max-width: 100vw;
+            margin: 0 0 44px 0;
+            padding: 0;
+            overflow: hidden;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #111c;
+            height: 410px;
+        }
+        .anime-slider .slide-btn {
+            position: absolute; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            background: #4cc9f0; 
+            color: #000; 
+            border: none; 
+            font-size: 2rem; 
+            padding: 10px; 
+            cursor: pointer; 
+            border-radius: 50%; 
+            z-index: 2;
+            opacity: 0.85;
+        }
+        .anime-slider .slide-btn.prev { left: 25px; }
+        .anime-slider .slide-btn.next { right: 25px; }
+        .hianime-slide {
+            display: none;
+            position: absolute;
+            width: 100vw;
+            height: 410px;
+            top: 0; left: 0;
+            justify-content: center;
+            align-items: center;
+            background: #111c;
+        }
+        .hianime-slide.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .hianime-slide img {
+            width: 100vw;
+            max-width: 750px;
+            height: 410px;
+            object-fit: cover;
+            border-radius: 0;
+        }
+        .slide-title {
+            margin-top: 15px;
+            font-size: 1.5rem;
+            color: #4cc9f0;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 6px #000c;
+        }
+        /* Anime List */
+        .anime-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 36px;
+            justify-content: flex-start;
+            margin: 0 auto 40px auto;
+            max-width: 1200px;
+        }
+        .anime-card {
+            background: rgba(24,24,24,0.8);
+            border-radius: 12px;
+            padding: 18px 16px;
+            width: 185px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.16);
+            transition: transform 0.18s;
+        }
+        .anime-card:hover { transform: translateY(-4px) scale(1.03);}
+        .anime-card img {
+            width: 130px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .anime-card h3, .anime-card h2 {
+            color: #4cc9f0;
+            font-size: 1.05rem;
+            margin: 10px 0 6px 0;
+        }
+        .anime-card p {
+            color: #ddd;
+            font-size: 0.97rem;
+            margin: 0;
+        }
+        @media (max-width: 900px) {
+            .main-content { max-width: 98vw; padding: 0 4vw 24px 4vw;}
+            .anime-slider, .hianime-slide, .hianime-slide img { height: 220px; }
+            .anime-card { width: 42vw; min-width: 160px;}
+        }
+        @media (max-width: 700px) {
+            .anime-list { gap: 16px;}
+            .anime-card { width: 90vw; min-width: 72vw;}
+            .anime-slider, .hianime-slide, .hianime-slide img { height: 130px; }
+        }
+        @media (max-width: 600px) {
+            header { padding: 10px 7px; }
+            .main-content { padding: 0 2vw 10px 2vw;}
+            .anime-list { gap: 12px;}
+            .anime-card img { width: 100px; height: 130px;}
+        }
+        </style>
+    </head>
+<body>
+    <header>
+    <a href="Assassingodk.html" class="logo"><i class="fas fa-infinity"></i>Anime.</a>
+        <nav class="navbar" id="navbar">
+            <a href="Assassingodk.html">home</a>
+            <a class="active" href="page2.html">anime</a>
+            <a href="#action">action</a>
+            <a href="#manga">manga</a>
+            <a href="#movies">movies</a>
+            <a href="favorites.html">favorites</a>
+        </nav>
+        <div class="icons">
+            <span class="menu-icon" id="menu-bars">&#9776;</span>
+            <span class="search-icon" id="search-icons" style="cursor: pointer;"><i class="fas fa-search"></i></span>
+            <span id="favorites-btn" role="button" aria-label="Favorites" style="cursor: pointer; position:relative; z-index:110;"><i id="favorites-icon" class="far fa-heart"></i></span>
+            <span id="user-icon" role="button" aria-label="User account" style="cursor: pointer; position:relative; z-index:110;"><i class="fas fa-user-circle"></i></span>
+        </div>
+        <div id="user-menu" class="user-menu" aria-hidden="true">
+            <div id="user-menu-content"></div>
+        </div>
+        <div class="search-bar" id="search-bar">
+            <div class="search-input-wrapper">
+                <input type="text" id="search-input" placeholder="Search anime...">
+                <button onclick="searchAnime()">Go</button>
+            </div>
+            <div class="search-suggestions" id="search-suggestions"></div>
+        </div>
+        <div id="favorites-panel" class="favorites-panel" aria-hidden="true"></div>
+    </header>
+    <main>
+        <div class="main-content">
+            <!-- Anime Slider -->
+            <section class="anime-slider">
+                <button class="slide-btn prev" onclick="prevSlide()"><i class="fas fa-chevron-left"></i></button>
+                <div class="hianime-slide active">
+                    <a href="aot.html">
+                        <img src="slides1.webp" alt="Attack on Titan">
+                    </a>
+                    <div class="slide-title">Attack on Titan</div>
+                </div>
+                <div class="hianime-slide">
+                    <a href="naruto.html">
+                        <img src="slide2.avif" alt="Naruto">
+                    </a>
+                    <div class="slide-title">Naruto</div>
+                </div>
+                <div class="hianime-slide">
+                    <a href="onepiece.html">
+                        <img src="slide3.webp" alt="One Piece">
+                    </a>
+                    <div class="slide-title">One Piece</div>
+                </div>
+                <div class="hianime-slide">
+                    <a href="bleach.html">
+                        <img src="slides5.webp" alt="Bleach">
+                    </a>
+                    <div class="slide-title">Bleach</div>
+                </div>
+                <div class="hianime-slide">
+                    <a href="danmachi.html">
+                        <img src="slide6.webp" alt="Danmachi">
+                    </a>
+                    <div class="slide-title">Danmachi</div>
+                </div>
+                <button class="slide-btn next" onclick="nextSlide()"><i class="fas fa-chevron-right"></i></button>
+            </section>
+            <!-- Anime Cards -->
+            <section class="anime-list">
+                <div class="anime-card">
+                    <a href="aot.html"><img src="aot.jpg" alt="Attack on Titan"></a>
+                    <h2><a href="aot.html" style="color:inherit;text-decoration:none;">Attack on Titan</a></h2>
+                    <p>Humanity fights for survival against giant Titans.</p>
+                </div>
+                <div class="anime-card">
+                    <a href="naruto.html"><img src="naruto.jpg" alt="Naruto"></a>
+                    <h2><a href="naruto.html" style="color:inherit;text-decoration:none;">Naruto</a></h2>
+                    <p>A ninja's journey to become Hokage.</p>
+                </div>
+                <div class="anime-card">
+                    <a href="onepiece.html"><img src="download.jpg" alt="One Piece"></a>
+                    <h2><a href="onepiece.html" style="color:inherit;text-decoration:none;">One Piece</a></h2>
+                    <p>Pirates search for the legendary treasure.</p>
+                </div>
+                <div class="anime-card">
+                    <a href="bleach.html"><img src="bleach.jpg" alt="Bleach"></a>
+                    <h2><a href="bleach.html" style="color:inherit;text-decoration:none;">Bleach</a></h2>
+                    <p>Ichigo battles evil spirits as a Soul Reaper.</p>
+                </div>
+                <div class="anime-card">
+                    <a href="danmachi.html"><img src="danmachi.jpg" alt="Danmachi"></a>
+                    <h2><a href="danmachi.html" style="color:inherit;text-decoration:none;">Danmachi</a></h2>
+                    <p>Adventures in the dungeon city of Orario.</p>
+
+                </div>
+                <!-- ...above content unchanged... -->
+                <div class="anime-card">
+                    <a href="boruto.html"><img src="boruto.jpg" alt="Boruto"></a>
+                    <h2><a href="boruto.html" style="color:inherit;text-decoration:none;">Boruto: Naruto Next Generations</a></h2>
+                    <p>The next generation of shinobi fights to protect Hidden Leaf Village.</p>
+                </div>
+<!-- ...below content unchanged... -->
+            </section>
+        </div>
+    </main>
+    <footer>
+        <div>
+
+            Owned and operated by koushik vardhan | 
+            <a href="tel:9390956911" style="color:var(--accent);">9390956911</a> | 
+            <a href="mailto:koushikvardhan2006@gmail.com" style="color:var(--accent);">koushikvardhan2006@gmail.com</a> | 
+            <span>andhra pradesh, india - 533005</span>
+        </div>
+    </footer>
+    <script>
+        // Navbar mobile toggle
+        const menuBars = document.getElementById('menu-bars');
+        const navbar = document.getElementById('navbar');
+        if (menuBars && navbar) {
+            menuBars.onclick = function(e) {
+                e.stopPropagation();
+                navbar.classList.toggle('show');
+            };
+            document.addEventListener('click', function(e) {
+                if (!navbar.contains(e.target) && !menuBars.contains(e.target)) {
+                    navbar.classList.remove('show');
+                }
+            });
+        }
+        // Search functionality - Simple version
+        document.getElementById('search-icons').onclick = function() {
+            var searchBar = document.getElementById('search-bar');
+            searchBar.classList.toggle('active');
+        };
+        function searchAnime() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            if (!query) return;
+            const animeMap = {
+                'naruto': 'naruto.html',
+                'bleach': 'bleach.html',
+                'danmachi': 'danmachi.html',
+                'aot': 'aot.html',
+                'onepiece': 'onepiece.html',
+                'boruto': 'boruto.html',
+            };
+            if (animeMap[query]) {
+                window.location.href = animeMap[query];
+            } else {
+                alert('Anime not found. Try: naruto, bleach, danmachi, aot, or onepiece');
+            }
+        }
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchAnime();
+        });
+        document.addEventListener('click', function(e) {
+            if (!searchBar.contains(e.target) && e.target !== searchIcon) {
+                searchBar.classList.remove('active');
+                document.getElementById('search-suggestions').classList.remove('show');
+            }
+        });
+        // Autocomplete functionality with cards
+        const animeData = {
+            'naruto': { title: 'Naruto', img: 'naruto.jpg', url: 'naruto.html', alias: ['naruto'] },
+            'bleach': { title: 'Bleach', img: 'bleach.jpg', url: 'bleach.html', alias: ['bleach'] },
+            'danmachi': { title: 'Danmachi', img: 'danmachi.jpg', url: 'danmachi.html', alias: ['danmachi'] },
+            'aot': { title: 'Attack on Titan', img: 'aot.jpg', url: 'aot.html', alias: ['aot', 'attack on titan'] },
+            'onepiece': { title: 'One Piece', img: 'download.jpg', url: 'onepiece.html', alias: ['onepiece', 'one piece'] },
+            'boruto': { title: 'Boruto', img: 'boruto.jpg', url: 'boruto.html', alias: ['boruto'] }
+        };
+        const searchInput = document.getElementById('search-input');
+        const suggestionsDiv = document.getElementById('search-suggestions');
+        searchInput.addEventListener('input', function() {
+            const value = this.value.toLowerCase().trim();
+            suggestionsDiv.innerHTML = '';
+            if (value.length === 0) {
+                suggestionsDiv.classList.remove('show');
+                return;
+            }
+            const filtered = Object.entries(animeData).filter(([key, anime]) => 
+                anime.title.toLowerCase().includes(value) || 
+                anime.alias.some(alias => alias.startsWith(value))
+            );
+            if (filtered.length === 0) {
+                suggestionsDiv.classList.remove('show');
+                return;
+            }
+            suggestionsDiv.classList.add('show');
+            filtered.forEach(([key, anime]) => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `<img src="${anime.img}" alt="${anime.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22%3E%3Crect fill=%22%23333%22 width=%22120%22 height=%22120%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'"><div class="suggestion-title">${anime.title}</div>`;
+                item.onclick = function(e) {
+                    e.stopPropagation();
+                    window.location.href = anime.url;
+                };
+                suggestionsDiv.appendChild(item);
+            });
+        });
+        // Slider
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hianime-slide');
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+        }
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        }
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === 'ArrowRight') nextSlide();
+        });
+        setInterval(nextSlide, 3000);
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <script>
+    // ...existing JS code...
+
+    // Hide navbar when scrolling down, show when scrolling up
+    (function() {
+        let lastScroll = 0;
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', function() {
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+            if (!header) return;
+            if (currentScroll > lastScroll && currentScroll > 60) {
+                header.classList.add('navbar-hidden');
+            } else {
+                header.classList.remove('navbar-hidden');
+            }
+            lastScroll = currentScroll;
+        }, { passive: true });
+    })();
+    </script>
+    </script>
+    <script>
+    // Add favorites heart to anime cards
+    (function(){
+      function loadFavorites(){
+        try{ return JSON.parse(localStorage.getItem('favorites')||'[]'); }catch(e){ return []; }
+      }
+      function saveFavorites(list){ localStorage.setItem('favorites', JSON.stringify(list||[])); }
+      function isFavorited(url){ const list = loadFavorites(); return !!list.find(f=>f.url === url); }
+      
+      document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('.anime-card').forEach(card=>{
+          if(card.querySelector('.card-fav')) return;
+          const link = card.querySelector('a[href]');
+          if(!link) return;
+          const url = link.getAttribute('href');
+          const h = card.querySelector('h3');
+          const title = h ? h.textContent.trim() : url;
+          
+          const btn = document.createElement('button');
+          btn.className = isFavorited(url) ? 'card-fav' : 'card-fav not-fav';
+          btn.innerHTML = '<i class="' + (isFavorited(url) ? 'fas' : 'far') + ' fa-heart"></i>';
+          btn.style.cssText = 'position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.5);border:none;padding:6px;border-radius:8px;cursor:pointer;z-index:50;';
+          
+          btn.addEventListener('click', function(e){
+            e.preventDefault(); 
+            e.stopPropagation();
+            const list = loadFavorites();
+            const idx = list.findIndex(f=>f.url===url);
+            if(idx>=0){
+              list.splice(idx, 1);
+              btn.classList.add('not-fav');
+              btn.innerHTML = '<i class="far fa-heart"></i>';
+            } else {
+              list.unshift({ title, url });
+              btn.classList.remove('not-fav');
+              btn.innerHTML = '<i class="fas fa-heart"></i>';
+            }
+            saveFavorites(list);
+          });
+          
+          card.style.position = 'relative';
+          card.insertBefore(btn, card.firstChild);
+        });
+      });
+    })();
+    
+    // Favorites button navigation
+    const favoritesBtn = document.getElementById('favorites-btn');
+    if (favoritesBtn) {
+      favoritesBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'favorites.html';
+      });
+    }
+
+    // User login/logout functionality
+    const userIcon = document.getElementById('user-icon');
+    const userMenu = document.getElementById('user-menu');
+    const userMenuContent = document.getElementById('user-menu-content');
+
+    function updateUserMenu() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser && currentUser.loggedIn) {
+            userMenuContent.innerHTML = `
+                <div class="user-menu-item" style="padding:10px;border-bottom:1px solid #4cc9f0;color:#4cc9f0;font-weight:600;">
+                    Welcome, ${currentUser.username}!
+                </div>
+                <button id="logoutBtn" style="width:100%;padding:10px;background:#ff7b9a;border:none;color:#fff;cursor:pointer;font-weight:600;border-radius:4px;">Logout</button>
+            `;
+            setTimeout(() => {
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', logout);
+                }
+            }, 0);
+        } else {
+            userMenuContent.innerHTML = `
+                <a href="login.html" style="display:block;padding:10px;color:#4cc9f0;text-decoration:none;text-align:center;border-bottom:1px solid #4cc9f0;font-weight:600;">Login</a>
+                <a href="sign up.html" style="display:block;padding:10px;color:#4cc9f0;text-decoration:none;text-align:center;font-weight:600;">Sign Up</a>
+            `;
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('rememberMe');
+        updateUserMenu();
+        userMenu.classList.remove('show');
+        window.location.href = window.location.href;
+    }
+
+    if (userIcon && userMenu) {
+        userIcon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userMenu.classList.toggle('show');
+            if (userMenu.classList.contains('show')) {
+                userMenu.setAttribute('aria-hidden', 'false');
+            } else {
+                userMenu.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!userMenu.contains(e.target) && e.target !== userIcon && !userIcon.contains(e.target)) {
+                userMenu.classList.remove('show');
+                userMenu.setAttribute('aria-hidden', 'true');
+            }
+        });
+    }
+
+    updateUserMenu();
+    </script>
+</body>
+</html>
+</body>
+</html>
+j

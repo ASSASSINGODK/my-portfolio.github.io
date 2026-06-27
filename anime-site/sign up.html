@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Anime Site</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .signup-container {
+            background: rgba(28, 31, 38, 0.95);
+            border-radius: 15px;
+            padding: 45px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid #4cc9f0;
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .signup-header h1 {
+            color: #4cc9f0;
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+
+        .signup-header p {
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #4cc9f0;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #232531;
+            border: 1px solid #4cc9f0;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #38b0d8;
+            box-shadow: 0 0 8px rgba(76, 201, 240, 0.3);
+        }
+
+        .form-group input::placeholder {
+            color: #888;
+        }
+
+        .password-toggle {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .password-toggle input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            background: #232531;
+            border: 1px solid #4cc9f0;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .password-toggle input:focus {
+            outline: none;
+            border-color: #38b0d8;
+            box-shadow: 0 0 8px rgba(76, 201, 240, 0.3);
+        }
+
+        .toggle-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #4cc9f0;
+            font-size: 1.2rem;
+            user-select: none;
+        }
+
+        .password-strength {
+            margin-top: 5px;
+            font-size: 0.8rem;
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .strength-bar {
+            height: 4px;
+            flex: 1;
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .strength-text {
+            width: 50px;
+            text-align: right;
+        }
+
+        .strength-weak { background: #ff7b9a; }
+        .strength-fair { background: #ffc857; }
+        .strength-strong { background: #06d6a0; }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            color: #aaa;
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .checkbox-group a {
+            color: #4cc9f0;
+            text-decoration: none;
+        }
+
+        .checkbox-group a:hover {
+            color: #ff7b9a;
+        }
+
+        .signup-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #4cc9f0, #38b0d8);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
+        }
+
+        .signup-btn:hover {
+            background: linear-gradient(135deg, #38b0d8, #2d98a8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(76, 201, 240, 0.4);
+        }
+
+        .signup-btn:active {
+            transform: translateY(0);
+        }
+
+        .signup-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.error {
+            background: rgba(255, 123, 154, 0.2);
+            color: #ff7b9a;
+            border: 1px solid #ff7b9a;
+        }
+
+        .message.success {
+            background: rgba(76, 201, 240, 0.2);
+            color: #4cc9f0;
+            border: 1px solid #4cc9f0;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+
+        .login-link a {
+            color: #4cc9f0;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .login-link a:hover {
+            color: #ff7b9a;
+        }
+
+        @media (max-width: 480px) {
+            .signup-container {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            .signup-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <h1><i class="fas fa-infinity"></i> Anime</h1>
+            <p>Create your account</p>
+        </div>
+
+        <form id="signupForm" onsubmit="handleSignup(event)">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    placeholder="Enter your email" 
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="newUsername">Username</label>
+                <input 
+                    type="text" 
+                    id="newUsername" 
+                    placeholder="Choose a username (min 3 chars)" 
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="newPassword">Password</label>
+            </div>
+            <div class="password-toggle">
+                <input 
+                    type="password" 
+                    id="newPassword" 
+                    placeholder="Create a password (min 6 chars)" 
+                    required
+                    oninput="updatePasswordStrength()"
+                >
+                <span class="toggle-icon" onclick="togglePasswordVisibility('newPassword')"><i class="fas fa-eye"></i></span>
+            </div>
+            <div class="password-strength">
+                <div class="strength-bar" id="strengthBar"></div>
+                <div class="strength-text" id="strengthText">-</div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+            </div>
+            <div class="password-toggle">
+                <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    placeholder="Confirm your password" 
+                    required
+                >
+                <span class="toggle-icon" onclick="togglePasswordVisibility('confirmPassword')"><i class="fas fa-eye"></i></span>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms" required>
+                <label for="terms">
+                    I agree to the <a href="#" onclick="alert('Terms & Conditions'); return false;">Terms & Conditions</a>
+                </label>
+            </div>
+
+            <button type="submit" class="signup-btn">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+
+            <div id="message" class="message"></div>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="login.html">Login here</a>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is already logged in
+        function checkAlreadyLoggedIn() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser && currentUser.loggedIn) {
+                window.location.href = 'Assassingodk.html';
+            }
+        }
+
+        // Update password strength indicator
+        function updatePasswordStrength() {
+            const password = document.getElementById('newPassword').value;
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+            
+            let strength = 0;
+            if (password.length >= 6) strength++;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[!@#$%^&*]/.test(password)) strength++;
+            
+            strengthBar.className = 'strength-bar';
+            if (strength <= 1) {
+                strengthBar.classList.add('strength-weak');
+                strengthText.textContent = '⚠️ Weak';
+            } else if (strength <= 3) {
+                strengthBar.classList.add('strength-fair');
+                strengthText.textContent = 'Fair';
+            } else {
+                strengthBar.classList.add('strength-strong');
+                strengthText.textContent = '✅ Strong';
+            }
+        }
+
+        // Validate username
+        function isUsernameValid(username) {
+            return username.length >= 3;
+        }
+
+        // Check if username already exists
+        function isUsernameAvailable(username) {
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+            return !users[username.toLowerCase()];
+        }
+
+        // Handle signup form submission
+        function handleSignup(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const username = document.getElementById('newUsername').value.toLowerCase().trim();
+            const password = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validation
+            if (!email || !username || !password || !confirmPassword) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (!isUsernameValid(username)) {
+                showMessage('Username must be at least 3 characters', 'error');
+                return;
+            }
+
+            if (!isUsernameAvailable(username)) {
+                showMessage('Username already taken. Please choose another', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                document.getElementById('confirmPassword').value = '';
+                return;
+            }
+
+            if (!document.getElementById('terms').checked) {
+                showMessage('Please agree to the Terms & Conditions', 'error');
+                return;
+            }
+
+            // Create new user
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+            users[username] = {
+                email: email,
+                password: password,
+                createdAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showMessage('Account created successfully! Redirecting to login...', 'success');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1500);
+        }
+
+        function showMessage(msg, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = msg;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+        }
+
+        // Toggle password visibility
+        function togglePasswordVisibility(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = event.target.closest('.toggle-icon').querySelector('i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAlreadyLoggedIn();
+        });
+    </script>
+</body>
+</html>

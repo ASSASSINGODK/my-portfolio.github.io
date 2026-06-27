@@ -246,8 +246,12 @@
         }
 
         function appendNumber(num) {
-            // If the current input is '0', replace it with the new number
-            if (currentInput === '0' && num !== '.') {
+            // If we should reset display, start fresh with new number
+            if (shouldResetDisplay) {
+                currentInput = num;
+                shouldResetDisplay = false;
+            } else if (currentInput === '0' && num !== '.') {
+                // If the current input is '0', replace it with the new number
                 currentInput = num;
             } else if (num === '.') {
                 // Prevent multiple decimals
@@ -258,7 +262,6 @@
                 currentInput += num;
             }
 
-            shouldResetDisplay = false;
             updateDisplay();
         }
 

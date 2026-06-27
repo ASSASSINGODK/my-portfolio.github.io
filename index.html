@@ -1,154 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>♾️Anime</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    /* Animated gradient background */
-    body {
-      min-height: 100vh;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-      background-size: 400% 400%;
-      animation: gradientBG 12s ease infinite;
-      font-family: 'Segoe UI', 'Arial', sans-serif;
-    }
-    @keyframes gradientBG {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
-
-    .container {
-      background: rgba(255, 255, 255, 0.18);
-      box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
-      backdrop-filter: blur(9px);
-      -webkit-backdrop-filter: blur(9px);
-      border-radius: 30px;
-      border: 1px solid rgba(255,255,255,0.25);
-      padding: 40px 32px 32px 32px;
-      width: 95%;
-      max-width: 400px;
-      text-align: center;
-    }
-
-    .anime-logo {
-      font-size: 3.5rem;
-      margin-bottom: 10px;
-      color: #fff;
-      text-shadow: 1px 1px 10px #0006;
-      font-weight: bold;
-      letter-spacing: 2px;
-    }
-
-    .subtitle {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
-      color: #faf2fa;
-      opacity: .85;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    li {
-      margin: 18px 0;
-      font-size: 1.1rem;
-    }
-    a {
-      padding: 10px 25px;
-      border-radius: 16px;
-      transition: all 0.22s cubic-bezier(.12,.79,.92,.47);
-      background: linear-gradient(to right, #00c6fb 0%, #005bea 100%);
-      color: #fff7fa;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-decoration: none;
-      box-shadow: 0 3px 12px #1f36493b;
-      border: none;
-      outline: none;
-      display: inline-block;
-      cursor: pointer;
-    }
-    a:hover, a:focus {
-      background: linear-gradient(to right, #005bea 0%, #00c6fb 100%);
-      box-shadow: 0 8px 24px #19395035;
-      color: #fff;
-      transform: scale(1.07);
-    }
-
-    @media (max-width: 500px) {
-      .container {
-        padding: 25px 5vw 18px 5vw;
-      }
-      .anime-logo {
-        font-size: 2.2rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio - Web Developer</title>
+    <link rel="stylesheet" href="koushik.css">
 </head>
 <body>
-  <div class="container">
-    <div class="anime-logo">♾️Anime</div>
-    <div class="subtitle">Your portal to worlds of adventure, action, and fun</div>
-    <ul>
-      <li><a href="Assassingodk.html">Home</a></li>
-      <li><a href="page2.html">Anime</a></li>
-      <!-- Add more as you want -->
-    </ul>
-  </div>
-  <script>
-  // Add favorites heart to anime cards
-  (function(){
-    function loadFavorites(){
-      try{ return JSON.parse(localStorage.getItem('favorites')||'[]'); }catch(e){ return []; }
-    }
-    function saveFavorites(list){ localStorage.setItem('favorites', JSON.stringify(list||[])); }
-    function isFavorited(url){ const list = loadFavorites(); return !!list.find(f=>f.url === url); }
-    
-    document.addEventListener('DOMContentLoaded', function(){
-      document.querySelectorAll('.anime-card').forEach(card=>{
-        if(card.querySelector('.card-fav')) return;
-        const link = card.querySelector('a[href]');
-        if(!link) return;
-        const url = link.getAttribute('href');
-        const h = card.querySelector('h3');
-        const title = h ? h.textContent.trim() : url;
-        
-        const btn = document.createElement('button');
-        btn.className = isFavorited(url) ? 'card-fav' : 'card-fav not-fav';
-        btn.innerHTML = '<i class="' + (isFavorited(url) ? 'fas' : 'far') + ' fa-heart"></i>';
-        btn.style.cssText = 'position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.5);border:none;padding:6px;border-radius:8px;cursor:pointer;z-index:50;';
-        
-        btn.addEventListener('click', function(e){
-          e.preventDefault(); 
-          e.stopPropagation();
-          const list = loadFavorites();
-          const idx = list.findIndex(f=>f.url===url);
-          if(idx>=0){
-            list.splice(idx, 1);
-            btn.classList.add('not-fav');
-            btn.innerHTML = '<i class="far fa-heart"></i>';
-          } else {
-            list.unshift({ title, url });
-            btn.classList.remove('not-fav');
-            btn.innerHTML = '<i class="fas fa-heart"></i>';
-          }
-          saveFavorites(list);
-        });
-        
-        card.style.position = 'relative';
-        card.insertBefore(btn, card.firstChild);
-      });
-    });
-  })();
-  </script>
+    <!-- Header -->
+    <header>
+        <h1>CHINTAPENTA VISWA SRI KOUSHIK VARDHAN</h1>
+        <p>Full Stack Developer & Data Science Enthusiast</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#resume">Resume</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- About Section -->
+    <section id="about">
+        <h2>About Me</h2>
+        <div class="about-content">
+            <img src="koushik.jpg" alt="Your Photo" class="profile-img">
+            <div class="about-text">
+                <p>I'm a passionate web developer and data science enthusiast with experience in building full-stack applications and machine learning projects. I specialize in creating data-driven solutions and beautiful user interfaces.</p>
+                <p>I have a strong foundation in Python, JavaScript, HTML/CSS, and machine learning frameworks. My recent project on house price prediction demonstrates my ability to work with real-world datasets and build predictive models.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills">
+        <h2>Skills</h2>
+        <div class="skills-container">
+            <div class="skill-category">
+                <h3>Frontend</h3>
+                <ul>
+                    <li>HTML5</li>
+                    <li>CSS3</li>
+                    <li>JavaScript</li>
+                    <li>Responsive Design</li>
+                </ul>
+            </div>
+            <div class="skill-category">
+                <h3>Backend</h3>
+                <ul>
+                    <li>Python</li>
+                    <li>Node.js</li>
+                    <li>REST APIs</li>
+                    <li>Database Design</li>
+                </ul>
+            </div>
+            <div class="skill-category">
+                <h3>Data Science</h3>
+                <ul>
+                    <li>Machine Learning</li>
+                    <li>Pandas & NumPy</li>
+                    <li>Scikit-learn</li>
+                    <li>Data Analysis</li>
+                </ul>
+            </div>
+             <div class="skill-category">
+                <h3>Programming Languages</h3>
+                <ul>
+                    <li>Python Basics</li>
+                    <li>Java Basics</li>
+                    <li>C Basics</li>
+                    <li>C++ Basics</li>
+                </ul>
+            </div>
+            <div class="skill-category">
+                <h3>Languages</h3>
+                <ul>
+                    <li>English</li>
+                    <li>Telugu</li>
+                    <li>Hindi (Basic)</li>
+                    <li>Tamil (Basic)</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <h2>Featured Projects</h2>
+        <div class="projects-grid">
+            
+            <!-- Project 1: House Price Prediction -->
+            <div class="project-card">
+                <div class="project-header">
+                    <h3>House Price Prediction Model</h3>
+                    <span class="project-badge">Machine Learning</span>
+                </div>
+                <img src="house-price-prediction.png" alt="House Price Prediction">
+                <div class="project-content">
+                    <p><strong>Description:</strong> A machine learning model that predicts house prices based on features like square footage, number of bedrooms, location, and more.</p>
+                    <p><strong>Technologies:</strong> Python, Pandas, Scikit-learn, NumPy, Matplotlib</p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul>
+                        <li>Data preprocessing and feature engineering</li>
+                        <li>Multiple regression algorithms comparison</li>
+                        <li>Model evaluation with R² and RMSE metrics</li>
+                        <li>Data visualization and analysis</li>
+                        <li>Predictive accuracy of 92%+</li>
+                    </ul>
+                    <p><strong>Results:</strong> Successfully trained and deployed a model achieving high accuracy in price predictions with detailed insights into feature importance.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/ASSASSINGODK/house-price-prediction/blob/main/code.py" target="_blank" class="btn-link">View Code</a>
+                        <a href="https://github.com/ASSASSINGODK/house-price-prediction/blob/main/ANALYSIS_REPORT.md" class="btn-link">View Report</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 2: Anime Website -->
+            <div class="project-card">
+                <div class="project-header">
+                    <h3>Anime Website</h3>
+                    <span class="project-badge">Web Development</span>
+                </div>
+                <img src="anime-website-preview.png" alt="Anime Website Preview">
+                <div class="project-content">
+                    <p><strong>Description:</strong> A responsive anime website with a modern UI, favorites system, and animated navigation for browsing series.</p>
+                    <p><strong>Technologies:</strong> HTML, CSS, JavaScript</p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul>
+                        <li>Animated gradient landing experience</li>
+                        <li>Favorites and interactive anime cards</li>
+                        <li>Responsive design for mobile and desktop</li>
+                        <li>Multiple anime detail pages with image previews</li>
+                    </ul>
+                    <p><strong>Results:</strong> Created an immersive anime portal that showcases series and enhances user engagement through stylish interactions.</p>
+                    <div class="project-links">
+                        <a href="anime-site/index.html" class="btn-link">View Live</a>
+                        <a href="anime-site/Assassingodk.js" class="btn-link">View Code</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Resume Section -->
+    <section id="resume">
+        <h2>Resume</h2>
+        <p>Download my resume to learn more about my experience and qualifications.</p>
+        <a href="koushik vardhan resume.docx" download class="btn-download">Download Resume (DOCX)</a>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2>Get In Touch</h2>
+        <div class="contact-content">
+            <div class="contact-info">
+                <p><strong>Email:</strong> koushikvardhan2006@gmail.com</p>
+                <p><strong>Phone:</strong> 9390956911</p>
+                <p><strong>Location:</strong> 4-102/15d Vakalapudi Srinivasa Nagar near Vinayaka Temple Churchpeta, Kakinada, Kakinada district, PIN 533005, Andhra Pradesh, India</p>
+            </div>
+            <div class="social-links">
+                <a href="https://github.com/ASSASSINGODK" target="_blank" class="social-btn">GitHub</a>
+                <a href="https://www.linkedin.com/in/koushik-vardhan-62650a331/" target="_blank" class="social-btn">LinkedIn</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Koushik Vardhan. All rights reserved.</p>
+    </footer>
 </body>
 </html>

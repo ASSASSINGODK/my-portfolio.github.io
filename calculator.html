@@ -263,6 +263,53 @@
         }
 
         updateDisplay();
-    </script>
+
+        // Keyboard Support
+        document.addEventListener('keydown', function(e) {
+            const key = e.key;
+
+            // Number keys (0-9)
+            if (key >= '0' && key <= '9') {
+                appendNumber(key);
+                e.preventDefault();
+            }
+            // Decimal point
+            else if (key === '.') {
+                appendNumber('.');
+                e.preventDefault();
+            }
+            // Operators
+            else if (key === '+') {
+                appendOperator('+');
+                e.preventDefault();
+            }
+            else if (key === '-') {
+                appendOperator('-');
+                e.preventDefault();
+            }
+            else if (key === '*') {
+                appendOperator('*');
+                e.preventDefault();
+            }
+            else if (key === '/' || key === 'Divide') {
+                appendOperator('/');
+                e.preventDefault();
+            }
+            // Equals (Enter or =)
+            else if (key === 'Enter' || key === '=') {
+                calculate();
+                e.preventDefault();
+            }
+            // Clear (Escape or C)
+            else if (key === 'Escape' || key.toLowerCase() === 'c') {
+                clearDisplay();
+                e.preventDefault();
+            }
+            // Delete (Backspace)
+            else if (key === 'Backspace') {
+                deleteLast();
+                e.preventDefault();
+            }
+        });
 </body>
 </html>
